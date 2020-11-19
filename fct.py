@@ -14,7 +14,7 @@ def plotSalle(S):
 ## A GARDER
 def creerSalle(densite,Ly,Lx):
     Ly=Ly+2
-    Lx=Ly+2
+    Lx=Lx+2
     #rempli la salle avec des gens aleatoirement placés
     salle=np.random.binomial(1, densite, size=(Ly,Lx))
     
