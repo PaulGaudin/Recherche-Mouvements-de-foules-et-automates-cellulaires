@@ -10,8 +10,10 @@ def plotSalle(S):
     plt.pcolor(S,cmap=cmap,norm=norm)
     plt.show()  
 
-
+## A GARDER
 def creerSalle(densite,Ly,Lx):
+    Ly=Ly+2
+    Lx=Ly+2
     #rempli la salle avec des gens aleatoirement placés
     salle=np.random.binomial(1, densite, size=(Ly,Lx))
     
@@ -38,12 +40,13 @@ def SFF(salle):
             
     return attractionCase
 
+## A GARDER
 #Afficher SFF
 def afficheSFF(salle):
     Ly=len(salle)
     Lx=len(salle[0])    
-    x=np.linspace(0, Lx, Lx)
-    y=np.linspace(0, Ly, Ly)
+    x=np.linspace(0, Lx+1, Lx+1)
+    y=np.linspace(0, Ly+1, Ly+1)
     z=SFF(salle)
     fig=plt.figure()
     im=plt.pcolor(x, y, z)
