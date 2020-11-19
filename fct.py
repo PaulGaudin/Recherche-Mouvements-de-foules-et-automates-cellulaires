@@ -2,6 +2,8 @@ import matplotlib.colors
 import numpy as np
 import matplotlib.pyplot as plt
 from random import uniform
+from matplotlib import animation, rc
+from IPython.display import HTML
 
 def plotSalle(S):
     cmap = matplotlib.colors.ListedColormap(['white','black',"red", "gray"])
@@ -179,9 +181,33 @@ def Deplacement(TM,k,u):
 
 #Affiche chaque tour jusqu'a ce que tout les automates soient sortis
 def resolution(TM,k,u):
+    evol=[TM]
     Nb=0
     while((TM==Init(TM.shape[0]-2,TM.shape[1]-2)).all()!=1):
         TM=Deplacement(TM,k,u)
-        plotSalle(TM)
+        evol.append(TM)
         Nb+=1
+
+    cmap = matplotlib.colors.ListedColormap(['white','black',"red", "gray"])
+    boundaries = [-0.2, 0.5, 1.5, 2.5, 3.5 ]
+    norm = matplotlib.colors.BoundaryNorm(boundaries, cmap.N, clip=True)
+
+    fig, ax = plt.subplots(figsize=(5,5))
+    cax = ax.pcolormesh(np.array([[]]),cmap=cmap,norm=norm)
+
+    def init():
+        cax = ax.pcolormesh(evol[0],cmap=cmap,norm=norm)
+        return cax
+
+    def animate(i):
+        cax = ax.pcolormesh(evol[i],cmap=cmap,norm=norm)
+        
+        #A completer
+        return cax
+
+    ani = animation.FuncAnimation(fig, animate, init_func=init, frames=Nb, interval=200, blit=False)
+
+    #video = HTML(ani.to_html5_video())
+    plt.show()
+    plt.clf()
     return Nb
