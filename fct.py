@@ -69,13 +69,11 @@ def Init(Ly,Lx):
 def SFF(T):
     dx=0.4
     R=np.copy(T)
-    for j in range(1,T[0].size-1):
-        for i in range(1,T[0].size-1):
-            R[j][i]=max(abs(np.sqrt((((i-0.5)*dx-(((T[0].size-2)/2)-0.5)*dx)**2)+(((j-0.5)*dx)**2))),abs(np.sqrt((((i-0.5)*dx-(((T[0].size-1)/2)-0.5)*dx)**2)+(((j-0.5)*dx)**2))))
-            if(i==int(T[0].size/2)):
-                R[0][i]=0
-            if(i==int((T[0].size/2)-1)):
-                R[0][i]=0
+    R=np.array([[max(abs(np.sqrt((((i-0.5)*dx-(((T[0].size-2)/2)-0.5)*dx)**2)+(((j-0.5)*dx)**2))),abs(np.sqrt((((i-0.5)*dx-(((T[0].size-1)/2)-0.5)*dx)**2)+(((j-0.5)*dx)**2)))) for i in range(T[0].size)] for j in range(T[0].size)])
+    a=np.arange(T[0].size)
+    b=np.arange(T[0].size)*[0]
+    c=np.ones(T[0].size).astype(np.int64)*[T[0].size-1]
+    R[a,b] = R[b,a] = R[a,c] = R[c,a] = 0
     return R
 
 
