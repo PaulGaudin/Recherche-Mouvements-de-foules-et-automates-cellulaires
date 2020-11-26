@@ -14,7 +14,7 @@ def plotSalle(S):
     plt.pcolor(S,cmap=cmap,norm=norm)
     plt.show()
 
-## A GARDER
+#Creation d'une pièce remplit d'automate
 def creerSalle(densite,Ly,Lx):
     Ly=Ly+2
     Lx=Lx+2
@@ -73,8 +73,7 @@ def SFF(T):
 
 
 #Fonction permettant de calculer w :
-def w(x,y,k,TM,t):
-    TS=SFF(TM)
+def w(x,y,k,TM,TS,t):
     d=((TM[x,y]!=3 and TM[x,y]!=1) or t==1)
     return np.exp(-k*TS[x,y])*d
 
@@ -84,7 +83,7 @@ def p(Z,W):
 
 
 #Fonction alternative calculant directement le poids d'une direction a partir des coordonnées de base et de la direction:
-def p2(x,y,k,TM,u,v):
+def p2(x,y,k,TM,TS,u,v):
     H=[[0,0],[-1,0],[1,0],[0,-1],[0,1]]
     wt=[]
     #wt=[w(x+H[i][0],y+H[i][1],k,TM,t) for i in range(len(H))]
@@ -93,14 +92,14 @@ def p2(x,y,k,TM,u,v):
             t=1
         else:
             t=0
-        wt.append(w(x+H[i][0],y+H[i][1],k,TM,t))
+        wt.append(w(x+H[i][0],y+H[i][1],k,TM,TS,t))
     
     Z=np.sum(wt)
     
-    return p(Z,w(u,v,k,TM,t))
+    return p(Z,w(u,v,k,TM,TS,t))
 
 #Fonction permettant d'obtenir le mouvement d'un automate :
-def Mouvement(x,y,k,TM):
+def Mouvement(x,y,k,TM,TS):
     H=[[0,0],[-1,0],[1,0],[0,-1],[0,1]]
     wt=[]
     pt=[]
@@ -109,7 +108,7 @@ def Mouvement(x,y,k,TM):
             t=1
         else:
             t=0
-        wt.append(w(x+H[i][0],y+H[i][1],k,TM,t))
+        wt.append(w(x+H[i][0],y+H[i][1],k,TM,TS,t))
     
     Z=np.sum(wt)
     pt=[p(Z,i) for i in wt]
@@ -122,15 +121,17 @@ def Mouvement(x,y,k,TM):
             return [x+H[i][0],y+H[i][1]]
 
 #Fonction permettant de récuperer tout les mouvements des automates :
-def update(TM,k):
+def update(TM,TS,k):
+    TS=SFF(TM)
     x,y = np.where(TM==1)
     base=np.vstack([x,y]).T
-    Mouv=np.array([Mouvement(x[i],y[i],k,TM) for i in range(x.size)])
+    Mouv=np.array([Mouvement(x[i],y[i],k,TM,TS) for i in range(x.size)])
     return Mouv,base
 
 #Fonction permettant si il y a conflit de les résoudre en utilisant la méthode de friction :
 def friction(TM,k,u):
-    M,B = update(TM,k)
+    TS=SFF(TM)
+    M,B = update(TM,TS,k)
     M=M.astype(np.int64)
     B=B.astype(np.int64)
     unique,indices,count=np.unique(M,return_inverse=True,return_counts=True,axis=0)
@@ -142,7 +143,7 @@ def friction(TM,k,u):
                 if(np.random.binomial(1,u,size=None)==1):
                     M[J[j]]=B[J[j]].copy()
                     M[J[j+1]]=B[J[j+1]].copy()
-                elif(p2(B[J[j],0],B[J[j],1],k,TM,M[J[j],0],M[J[j],1])>p2(B[J[j+1],0],B[J[j+1],1],k,TM,M[J[j+1],0],M[J[j+1],1])):
+                elif(p2(B[J[j],0],B[J[j],1],k,TM,TS,M[J[j],0],M[J[j],1])>p2(B[J[j+1],0],B[J[j+1],1],k,TM,TS,M[J[j+1],0],M[J[j+1],1])):
                     M[J[j+1]]=B[J[j+1]].copy()
                 else:
                     M[J[j]]=B[J[j]].copy()               
