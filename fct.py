@@ -1,9 +1,10 @@
 import matplotlib.colors
 import numpy as np
 import matplotlib.pyplot as plt
+import timeit
 from random import uniform
 from matplotlib import animation, rc
-from IPython.display import HTML
+
 
 def plotSalle(S):
     cmap = matplotlib.colors.ListedColormap(['white','black',"red", "gray"])
@@ -49,18 +50,12 @@ def afficheSFF(salle):
 
 #Initialisation de la pièce :
 def Init(Ly,Lx):
-    piece=np.eye(Ly+2,Lx+2)
-    for i in range(Ly+2):
-        for j in range(Lx+2):
-            piece[i,j]=0
-
-            if (i==0 or i==Ly+1):
-                piece[i,j]=3
-            if ((j==0 or j==Lx+1) and i!=Ly+2):
-                piece[i,j]=3
-            if (i==0):
-                if (j==Lx/2 or j==((Lx/2)+1)):
-                    piece[0,j]=2
+    piece=np.zeros(shape=(Ly+2,Lx+2))
+    a=np.arange(piece[0].size)
+    b=np.arange(piece[0].size)*[0]
+    c=np.ones(piece[0].size).astype(np.int64)*[piece[0].size-1]
+    piece[a,b] = piece[b,a] = piece[a,c] = piece[c,a] = 3
+    piece[0,int(Lx/2)]=piece[0,int((Lx/2)+1)]=2
             
     return piece
 
@@ -117,8 +112,7 @@ def Mouvement(x,y,k,TM):
         wt.append(w(x+H[i][0],y+H[i][1],k,TM,t))
     
     Z=np.sum(wt)
-    for i in range(len(wt)):
-        pt.append(p(Z,wt[i]))
+    pt=[p(Z,i) for i in wt]
         
     A=uniform(0,sum(pt))
     B=0
@@ -139,18 +133,19 @@ def friction(TM,k,u):
     M,B = update(TM,k)
     M=M.astype(np.int64)
     B=B.astype(np.int64)
-    for i in range(M.shape[0]):
-        for j in range(M.shape[0]):
-            if(i!=j and M[i,0]==M[j,0] and M[i,1]==M[j,1]): #A optimiser
+    unique,indices,count=np.unique(M,return_inverse=True,return_counts=True,axis=0)
+    if(not (count==np.ones(count.size)).all()):
+        I=np.where(count>1)[0]
+        for i in I:
+            J=np.where(indices==i)[0]
+            for j in range(J.size-1):
                 if(np.random.binomial(1,u,size=None)==1):
-                    M[i]=B[i].copy()
-                    M[j]=B[j].copy()
+                    M[J[j]]=B[J[j]].copy()
+                    M[J[j+1]]=B[J[j+1]].copy()
+                elif(p2(B[J[j],0],B[J[j],1],k,TM,M[J[j],0],M[J[j],1])>p2(B[J[j+1],0],B[J[j+1],1],k,TM,M[J[j+1],0],M[J[j+1],1])):
+                    M[J[j+1]]=B[J[j+1]].copy()
                 else:
-                    if(p2(B[i,0],B[i,1],k,TM,M[i,0],M[i,1])>p2(B[j,0],B[j,1],k,TM,M[j,0],M[j,1])):
-                        M[j]=B[j].copy()
-                    else:
-                        M[i]=B[i].copy()
-                        
+                    M[J[j]]=B[J[j]].copy()               
     return M
 
 
@@ -158,17 +153,35 @@ def friction(TM,k,u):
 def Deplacement(TM,k,u):
     New=friction(TM,k,u)
     Temp=Init(TM.shape[0]-2,TM.shape[1]-2)
-    for i in range(TM.shape[0]):
-        for j in range(TM.shape[1]):
-            for u in range(New.shape[0]):
-                if(i==New[u,0] and j==New[u,1]):
-                    Temp[i,j]=1
-                
-                if((i==0 and j==TM.shape[0]/2) or (i==0 and j==(TM.shape[0]/2)-1)):
-                    Temp[i,j]=2
-    
-    return Temp
+    if(np.shape(New)[0]==0):
+        return Temp
+    else:
+        x,y=New.transpose()
+        Temp[x,y]=1
+        Temp[0,int(TM.shape[0]/2)]=Temp[0,int((TM.shape[1]/2)-1)]=2
+        return Temp
 
+#Un timer
+def timer(function):
+    def inner(*args, **kwargs):
+        start = timeit.default_timer()
+        result = function(*args, **kwargs)
+        end = timeit.default_timer()
+        time = end - start
+        # print(f"Executed in {round(time,3) if time > 0.001 else 'less than 0.001'} seconds.")
+        print(f"Function {function.__name__} executed in {time} seconds.")
+        return result
+        
+    return inner
+
+#Effectue une résolution complète et renvoie le nombre de tour necessaires
+@timer
+def resolv(TM,k,u):
+    Nb=0
+    while((TM==Init(TM.shape[0]-2,TM.shape[1]-2)).all()!=1):
+        TM=Deplacement(TM,k,u)
+        Nb+=1
+    return Nb
 
 
 #Affiche chaque tour jusqu'a ce que tout les automates soient sortis
@@ -194,7 +207,7 @@ def resolution(TM,k,u):
     def animate(i):
         cax = ax.pcolormesh(evol[i],cmap=cmap,norm=norm)
         
-        #A completer
+        ax.set_title(f"Tour numéro {i}, il reste {np.sum(evol[i]==1)} automates")
         return cax
 
     ani = animation.FuncAnimation(fig, animate, init_func=init, frames=Nb, interval=200, blit=False)
@@ -203,3 +216,4 @@ def resolution(TM,k,u):
     plt.show()
     plt.clf()
     return Nb
+
