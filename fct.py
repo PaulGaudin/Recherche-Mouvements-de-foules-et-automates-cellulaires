@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import timeit
 from random import uniform
 from matplotlib import animation, rc
+from random import randint
 
 
 def plotSalle(S):
@@ -218,3 +219,42 @@ def resolution(TM,k,u):
     plt.clf()
     return Nb
 
+
+#Fonction effectuant un déplacement complet de tout les automates en parallèle (méthode de friction): 
+def Deplacement2(TM,k,u):
+    New=friction(TM,k,u)
+    Temp=Init(TM.shape[0]-2,TM.shape[1]-2)
+    if(np.shape(New)[0]==0):
+        return Temp
+        
+    else:
+        x,y=New.transpose()
+        k=0
+        for i in x:
+                for j in y:
+                    #si le mouvement ne mene pas sur une porte, on inscrit cette position sur Temp
+                    if ([i,j] != [0, int(TM.shape[0]/2)]) and ([i,j] != [0, int((TM.shape[1]/2)-1)]):
+                        Temp[i,j]=1
+                    #sinon on compte le nb de personnes sortantes
+                    else:
+                        k=k+1
+        #On veut maintenant reinjecter le nombre de personnes sortantes dans Temp vers le fond
+        #On creer un espace de coordonées ou reinjecter les personnes = 2 bandes au fond de la salle
+        x_reinjection_min=2
+        x_reinjection_max=(len(Temp[0])-1)-2
+
+        y_reinjection_min=(len(Temp)-1)-5
+        y_reinjection_max=(len(Temp)-1)-2
+   
+        for i in range(k):
+            #Pour chaque personne a reinjecter, on choisit des coordonées au hasrad dans la rectangle de respawn
+            new_x=randint(x_reinjection_min, x_reinjection_max)
+            new_y=randint(y_reinjection_min, y_reinjection_max) 
+
+            while(Temp[new_x,new_y]!=0):
+                new_x=randint(x_reinjection_min, x_reinjection_max)
+                new_y=randint(y_reinjection_min, y_reinjection_max) 
+
+            Temp[new_x,new_y]=1
+    
+    return Temp
