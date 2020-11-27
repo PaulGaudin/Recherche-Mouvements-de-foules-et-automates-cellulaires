@@ -258,3 +258,37 @@ def Deplacement2(TM,k,u):
             Temp[new_x,new_y]=1
     
     return Temp
+
+
+
+    def resolution2(TM,k,u):
+        evol=[TM]
+        Nb=0
+        while((TM==Init(TM.shape[0]-2,TM.shape[1]-2)).all()!=1):
+            TM=Deplacement2(TM,k,u)
+            evol.append(TM)
+            Nb+=1
+
+        cmap = matplotlib.colors.ListedColormap(['white','black',"red", "gray"])
+        boundaries = [-0.2, 0.5, 1.5, 2.5, 3.5 ]
+        norm = matplotlib.colors.BoundaryNorm(boundaries, cmap.N, clip=True)
+
+        fig, ax = plt.subplots(figsize=(5,5))
+        cax = ax.pcolormesh(np.array([[]]),cmap=cmap,norm=norm)
+
+        def init():
+            cax = ax.pcolormesh(evol[0],cmap=cmap,norm=norm)
+            return cax
+
+        def animate(i):
+            cax = ax.pcolormesh(evol[i],cmap=cmap,norm=norm)
+        
+            ax.set_title(f"Tour numéro {i}, il reste {np.sum(evol[i]==1)} automates")
+            return cax
+
+        ani = animation.FuncAnimation(fig, animate, init_func=init, frames=Nb, interval=200, blit=False)
+
+        #video = HTML(ani.to_html5_video())
+        plt.show()
+        plt.clf()
+        return Nb
