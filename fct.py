@@ -238,27 +238,43 @@ def Deplacement2(TM,k,u):
                     #sinon on compte le nb de personnes sortantes
                     else:
                         k=k+1
+                        
         #On veut maintenant reinjecter le nombre de personnes sortantes dans Temp vers le fond
         #On creer un espace de coordonées ou reinjecter les personnes = 2 bandes au fond de la salle
         x_reinjection_min=2
         x_reinjection_max=(len(Temp[0])-1)-2
 
-        y_reinjection_min=(len(Temp)-1)-5
-        y_reinjection_max=(len(Temp)-1)-2
-   
-        for i in range(k):
-            #Pour chaque personne a reinjecter, on choisit des coordonées au hasrad dans la rectangle de respawn
-            new_x=randint(x_reinjection_min, x_reinjection_max)
-            new_y=randint(y_reinjection_min, y_reinjection_max) 
+        #y_reinjection_min=(len(Temp)-1)-4
+        #y_reinjection_max=(len(Temp)-1)-2
 
-            while(Temp[new_x,new_y]!=0):
+        y_reinjection_min=2
+        y_reinjection_max=4
+
+        if k<0:  
+
+            for i in range(k):
+                #Pour chaque personne a reinjecter, on choisit des coordonées au hasard dans la rectangle de respawn
                 new_x=randint(x_reinjection_min, x_reinjection_max)
                 new_y=randint(y_reinjection_min, y_reinjection_max) 
+                print(new_x)
+                print(new_y)
 
-            Temp[new_x,new_y]=1
+            #while(Temp[new_x,new_y]!=0):
+               # new_x=randint(x_reinjection_min, x_reinjection_max)
+                #new_y=randint(y_reinjection_min, y_reinjection_max) 
+
+                Temp[new_x,new_y]=1
     
     return Temp
 
+
+def sortiCeTour(TM):
+    compt=0
+    for i in range(len(TM[0])):
+        for j in range(len(TM)):
+            if (TM[i][j]==[0, int(TM.shape[0]/2)]) and ([i,j] == [0, int((TM.shape[1]/2)-1)]):
+                compt=compt+1
+    return compt
 
 
 def resolution2(TM,k,u):
