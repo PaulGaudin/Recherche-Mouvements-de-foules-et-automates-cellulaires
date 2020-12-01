@@ -229,39 +229,42 @@ def Deplacement2(TM,k,u):
         
     else:
         x,y=New.transpose()
-        k=0
-        for i in x:
-                for j in y:
+        Temp[x,y]=1
+        Temp[0,int(TM.shape[0]/2)]=Temp[0,int((TM.shape[1]/2)-1)]=2
+        k=np.size(np.where(x==0))
+        #for i in x:
+        #        for j in y:
                     #si le mouvement ne mene pas sur une porte, on inscrit cette position sur Temp
-                    if ([i,j] != [0, int(TM.shape[0]/2)]) and ([i,j] != [0, int((TM.shape[1]/2)-1)]):
-                        Temp[i,j]=1
+        #            if (([i,j] != [0, int(TM.shape[0]/2)]) and ([i,j] != [0, int((TM.shape[1]/2)-1)])):
+        #                Temp[i,j]=1
                     #sinon on compte le nb de personnes sortantes
-                    else:
-                        k=k+1
+        #            else:
+        #                k=k+1
                         
-        #On veut maintenant reinjecter le nombre de personnes sortantes dans Temp vers le fond
-        #On creer un espace de coordonées ou reinjecter les personnes = 2 bandes au fond de la salle
-        x_reinjection_min=2
-        x_reinjection_max=(len(Temp[0])-1)-2
+        
 
-        #y_reinjection_min=(len(Temp)-1)-4
-        #y_reinjection_max=(len(Temp)-1)-2
+        if k>0:  
+            
+            #On veut maintenant reinjecter le nombre de personnes sortantes dans Temp vers le fond
+            #On creer un espace de coordonées ou reinjecter les personnes = 2 bandes au fond de la salle
+            x_reinjection_min=1
+            x_reinjection_max=(len(Temp[0])-1)-1
 
-        y_reinjection_min=2
-        y_reinjection_max=4
+            #y_reinjection_min=(len(Temp)-1)-4
+            #y_reinjection_max=(len(Temp)-1)-2
 
-        if k<0:  
+            y_reinjection_min=1
+            y_reinjection_max=3
 
             for i in range(k):
                 #Pour chaque personne a reinjecter, on choisit des coordonées au hasard dans la rectangle de respawn
-                new_x=randint(x_reinjection_min, x_reinjection_max)
-                new_y=randint(y_reinjection_min, y_reinjection_max) 
-                print(new_x)
-                print(new_y)
+                new_x=new_y=0
+                #print(new_x)
+                #print(new_y)
 
-            #while(Temp[new_x,new_y]!=0):
-               # new_x=randint(x_reinjection_min, x_reinjection_max)
-                #new_y=randint(y_reinjection_min, y_reinjection_max) 
+                while(Temp[new_x,new_y]!=0):
+                    new_x=randint(x_reinjection_min, x_reinjection_max)
+                    new_y=randint(y_reinjection_min, y_reinjection_max) 
 
                 Temp[new_x,new_y]=1
     
@@ -277,10 +280,10 @@ def sortiCeTour(TM):
     return compt
 
 
-def resolution2(TM,k,u):
+def resolution2(TM,k,u,X):
     evol=[TM]
     Nb=0
-    while((TM==Init(TM.shape[0]-2,TM.shape[1]-2)).all()!=1):
+    while((TM==Init(TM.shape[0]-2,TM.shape[1]-2)).all()!=1 and Nb<X):
         TM=Deplacement2(TM,k,u)
         evol.append(TM)
         Nb+=1
