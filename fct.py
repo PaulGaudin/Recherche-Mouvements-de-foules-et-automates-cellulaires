@@ -233,7 +233,7 @@ def Deplacement2(TM,k,u):
         x,y=New.transpose()
         Temp[x,y]=1
         Temp[0,int(TM.shape[0]/2)]=Temp[0,int((TM.shape[1]/2)-1)]=2
-        k=np.size(np.where(x==0))
+        k=0
         #for i in x:
         #        for j in y:
                     #si le mouvement ne mene pas sur une porte, on inscrit cette position sur Temp
@@ -245,7 +245,7 @@ def Deplacement2(TM,k,u):
                         
         
 
-        if k>0:  
+        while(np.sum(TM==1)!=np.sum(Temp==1)): 
             
             #On veut maintenant reinjecter le nombre de personnes sortantes dans Temp vers le fond
             #On creer un espace de coordonées ou reinjecter les personnes = 2 bandes au fond de la salle
@@ -255,38 +255,30 @@ def Deplacement2(TM,k,u):
             y_reinjection_min=1
             y_reinjection_max=len(TM-1)-2
 
+            #Pour chaque personne a reinjecter, on choisit des coordonées au hasard dans la rectangle de respawn
+            new_x=new_y=0
+            #print(new_x)
+            #print(new_y)
 
-            
-
-            for i in range(k):
-                #Pour chaque personne a reinjecter, on choisit des coordonées au hasard dans la rectangle de respawn
+            while(Temp[new_x,new_y]!=0):
                 new_x=new_y=0
-                #print(new_x)
-                #print(new_y)
+                new_x=randint(x_reinjection_min, x_reinjection_max)
+                new_y=randint(y_reinjection_min, y_reinjection_max) 
 
-                while(Temp[new_x,new_y]!=0):
-                    new_x=randint(x_reinjection_min, x_reinjection_max)
-                    new_y=randint(y_reinjection_min, y_reinjection_max) 
-
-                Temp[new_x,new_y]=1
+            Temp[new_x,new_y]=1
+            k+=1
     
-    return Temp
+    return Temp,k
 
 
-def sortiCeTour(TM):
-    compt=0
-    for i in range(len(TM[0])):
-        for j in range(len(TM)):
-            if (TM[i][j]==[0, int(TM.shape[0]/2)]) and ([i,j] == [0, int((TM.shape[1]/2)-1)]):
-                compt=compt+1
-    return compt
-
-
-def resolution2(TM,k,u,X):
+def resolution2(TM,k,u):
     evol=[TM]
     Nb=0
-    while((TM==Init(TM.shape[0]-2,TM.shape[1]-2)).all()!=1 and Nb<X):
-        TM=Deplacement2(TM,k,u)
+    X=np.sum(TM==1)*2
+    NStop=0
+    while((TM==Init(TM.shape[0]-2,TM.shape[1]-2)).all()!=1 and NStop<X):
+        TM,n=Deplacement2(TM,k,u)
+        NStop+=n
         evol.append(TM)
         Nb+=1
 
@@ -314,17 +306,3 @@ def resolution2(TM,k,u,X):
     plt.clf()
     return Nb
         
-def zoneRespawn(TM):
-
-    x_reinjection_min=(len(TM)-1)-3
-    x_reinjection_max=(len(TM)-1)-1
-
-    y_reinjection_min=1
-    y_reinjection_max=len(TM-1)-2
-
-    TM[x_reinjection_min, y_reinjection_min]=2
-    TM[x_reinjection_min, y_reinjection_max]=4
-    TM[x_reinjection_max, y_reinjection_min]=4
-    TM[x_reinjection_max, y_reinjection_max]=4
-
-    return TM
