@@ -17,18 +17,15 @@ def plotSalle(S):
 
 #Creation d'une pièce remplit d'automate
 def creerSalle(densite,Ly,Lx):
-    Ly=Ly+2
-    Lx=Lx+2
+    ligneMur = [3]*(Ly+2)
+    colonneMur = [3]*Lx
     #rempli la salle avec des gens aleatoirement placés
     salle=np.random.binomial(1, densite, size=(Ly,Lx))
     
     #créer des murs en gris
-    for i in range(0, Lx):
-        salle[0,i]=3
-        salle[Ly-1,i]=3
-    for i in range(0, Ly):
-        salle[i,0]=3
-        salle[i,Lx-1]=3
+    salle = np.column_stack((colonneMur, salle, colonneMur))
+    salle = np.vstack((ligneMur, salle, ligneMur))
+
     #créer une porte representée en rouge
     salle[0,int(Lx/2)]=2
     salle[0,int((Lx-1)/2)]=2
