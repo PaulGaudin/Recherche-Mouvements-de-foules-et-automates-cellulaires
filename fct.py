@@ -341,3 +341,38 @@ def SimulationsK(d,taille,u,kmin,kmax,Npas,Nsim):
     plt.ylabel("Nombre de tours")
     plt.title(f"Nombre de tour mis pour purger une piece de taille {taille} et densité {d}, en fonction de k, pour u={u} ({Nsim} simulations par pas, {Npas} pas de k, et k variant de {kmin} a {kmax})")
     plt.show()
+
+
+
+@timer    
+def SimulationsUR(d,taille,k,Npas,Nsim):
+    Terrains=np.asarray([creerSalle(d,taille[0],taille[1]) for i in range(Nsim)])
+    u=np.linspace(0,1,Npas)
+    Ntours=np.asarray([[resolv2(Terrain,k,ut) for Terrain in Terrains] for ut in u])
+    N=np.zeros(Npas)
+    for i in range(Npas):
+        N[i]=Ntours[i].sum()/Ntours[i].size
+
+    fig = plt.figure(figsize=(15,10))
+    plt.plot(u,N*0.27)
+    plt.xlabel("U")
+    plt.ylabel("Temps (en s)")
+    plt.title(f"Nombre de tour mis pour purger une piece de taille {taille*0.4} mètres et densité {d}, en fonction de u (coeff de friction), pour k={k} ({Nsim} simulations par pas, {Npas} pas de u)")
+    plt.show()
+
+
+@timer
+def SimulationsKR(d,taille,u,kmin,kmax,Npas,Nsim):
+    Terrains=np.asarray([creerSalle(d,taille[0],taille[1]) for i in range(Nsim)])
+    k=np.linspace(0,kmax,Npas)
+    Ntours=np.asarray([[resolv2(Terrain,kt,u) for Terrain in Terrains] for kt in k])
+    N=np.zeros(Npas)
+    for i in range(Npas):
+        N[i]=Ntours[i].sum()/Ntours[i].size
+
+    fig = plt.figure(figsize=(15,10))
+    plt.plot(k,N*0.27)
+    plt.xlabel("k")
+    plt.ylabel("Temps (en s)")
+    plt.title(f"Nombre de tour mis pour purger une piece de taille {taille*0.4} mètres et densité {d}, en fonction de k, pour u={u} ({Nsim} simulations par pas, {Npas} pas de k, et k variant de {kmin} a {kmax})")
+    plt.show()
