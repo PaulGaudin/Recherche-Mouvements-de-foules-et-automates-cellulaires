@@ -8,8 +8,8 @@ from random import randint
 
 
 def plotSalle(S):
-    cmap = matplotlib.colors.ListedColormap(['white','black',"red", "gray"])
-    boundaries = [-0.2, 0.5, 1.5, 2.5, 3.5 ]
+    cmap = matplotlib.colors.ListedColormap(['white','black',"red", "gray", "yellow"])
+    boundaries = [-0.2, 0.5, 1.5, 2.5, 3.5, 4.5]
     norm = matplotlib.colors.BoundaryNorm(boundaries, cmap.N, clip=True)
     plt.figure(figsize=(5,5))
     plt.pcolor(S,cmap=cmap,norm=norm)
@@ -249,18 +249,11 @@ def Deplacement2(TM,k,u):
             
             #On veut maintenant reinjecter le nombre de personnes sortantes dans Temp vers le fond
             #On creer un espace de coordonées ou reinjecter les personnes = 2 bandes au fond de la salle
-            x_reinjection_min=2
-            x_reinjection_max=(len(Temp[0])-1)-2
+            x_reinjection_min=(len(TM)-1)-3
+            x_reinjection_max=(len(TM)-1)-1
 
-            y_reinjection_min=(len(Temp)-1)-4
-            y_reinjection_max=(len(Temp)-1)-2
-            #y_reinjection_min=1
-            #y_reinjection_max=3
-
-            Temp[x_reinjection_min, y_reinjection_min]=4
-            Temp[x_reinjection_min, y_reinjection_max]=4
-            Temp[x_reinjection_max, y_reinjection_min]=4
-            Temp[x_reinjection_max, y_reinjection_max]=4
+            y_reinjection_min=1
+            y_reinjection_max=len(TM-1)-2
 
 
             
@@ -297,8 +290,8 @@ def resolution2(TM,k,u,X):
         evol.append(TM)
         Nb+=1
 
-    cmap = matplotlib.colors.ListedColormap(['white','black',"red", "gray", "blue"])
-    boundaries = [-0.2, 0.5, 1.5, 2.5, 3.5 , 4.5]
+    cmap = matplotlib.colors.ListedColormap(['white','black',"red", "gray"])
+    boundaries = [-0.2, 0.5, 1.5, 2.5, 3.5]
     norm = matplotlib.colors.BoundaryNorm(boundaries, cmap.N, clip=True)
 
     fig, ax = plt.subplots(figsize=(5,5))
@@ -323,13 +316,13 @@ def resolution2(TM,k,u,X):
         
 def zoneRespawn(TM):
 
-    x_reinjection_min=2
-    x_reinjection_max=(len(TM[0])-1)-2
+    x_reinjection_min=(len(TM)-1)-3
+    x_reinjection_max=(len(TM)-1)-1
 
     y_reinjection_min=1
-    y_reinjection_max=3
+    y_reinjection_max=len(TM-1)-2
 
-    TM[x_reinjection_min, y_reinjection_min]=4
+    TM[x_reinjection_min, y_reinjection_min]=2
     TM[x_reinjection_min, y_reinjection_max]=4
     TM[x_reinjection_max, y_reinjection_min]=4
     TM[x_reinjection_max, y_reinjection_max]=4
