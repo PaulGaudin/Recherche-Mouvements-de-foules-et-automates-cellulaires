@@ -234,31 +234,20 @@ def Deplacement2(TM,k,u):
         Temp[x,y]=1
         Temp[0,int(TM.shape[0]/2)]=Temp[0,int((TM.shape[1]/2)-1)]=2
         k=0
-        #for i in x:
-        #        for j in y:
-                    #si le mouvement ne mene pas sur une porte, on inscrit cette position sur Temp
-        #            if (([i,j] != [0, int(TM.shape[0]/2)]) and ([i,j] != [0, int((TM.shape[1]/2)-1)])):
-        #                Temp[i,j]=1
-                    #sinon on compte le nb de personnes sortantes
-        #            else:
-        #                k=k+1
-                        
-        
+                    
+        #On veut maintenant reinjecter le nombre de personnes sortantes dans Temp vers le fond
+        #On creer un espace de coordonées ou reinjecter les personnes = 2 bandes au fond de la salle
+        x_reinjection_min=(len(TM)-1)-3
+        x_reinjection_max=(len(TM)-1)-1
+
+        y_reinjection_min=1
+        y_reinjection_max=len(TM-1)-2
 
         while(np.sum(TM==1)!=np.sum(Temp==1)): 
-            
-            #On veut maintenant reinjecter le nombre de personnes sortantes dans Temp vers le fond
-            #On creer un espace de coordonées ou reinjecter les personnes = 2 bandes au fond de la salle
-            x_reinjection_min=(len(TM)-1)-3
-            x_reinjection_max=(len(TM)-1)-1
 
-            y_reinjection_min=1
-            y_reinjection_max=len(TM-1)-2
 
             #Pour chaque personne a reinjecter, on choisit des coordonées au hasard dans la rectangle de respawn
             new_x=new_y=0
-            #print(new_x)
-            #print(new_y)
 
             while(Temp[new_x,new_y]!=0):
                 new_x=new_y=0
@@ -306,3 +295,49 @@ def resolution2(TM,k,u):
     plt.clf()
     return Nb
         
+@timer
+def resolv2(TM,k,u):
+    Nb=0
+    X=np.sum(TM==1)
+    NStop=0
+    Na=0
+    while((TM==Init(TM.shape[0]-2,TM.shape[1]-2)).all()!=1 and NStop<(X*3)):
+        TM,n=Deplacement2(TM,k,u)
+        NStop+=n
+        if(NStop==(X*2)):
+            Na=Nb
+        Nb+=1
+    return Nb-Na
+
+@timer    
+def SimulationsU(d,taille,k,Npas,Nsim):
+    Terrains=np.asarray([creerSalle(d,taille[0],taille[1]) for i in range(Nsim)])
+    u=np.linspace(0,1,Npas)
+    Ntours=np.asarray([[resolv2(Terrain,k,ut) for Terrain in Terrains] for ut in u])
+    N=np.zeros(Npas)
+    for i in range(Npas):
+        N[i]=Ntours[i].sum()/Ntours[i].size
+
+    fig = plt.figure(figsize=(15,10))
+    plt.plot(u,N)
+    plt.xlabel("U")
+    plt.ylabel("Nombre de tours")
+    plt.title(f"Nombre de tour mis pour purger une piece de taille {taille} et densité {d}, en fonction de u (coeff de friction), pour k={k} ({Nsim} simulations par pas, {Npas} pas de u)")
+    plt.show()
+
+
+@timer
+def SimulationsK(d,taille,u,kmin,kmax,Npas,Nsim):
+    Terrains=np.asarray([creerSalle(d,taille[0],taille[1]) for i in range(Nsim)])
+    k=np.linspace(0,kmax,Npas)
+    Ntours=np.asarray([[resolv2(Terrain,kt,u) for Terrain in Terrains] for kt in k])
+    N=np.zeros(Npas)
+    for i in range(Npas):
+        N[i]=Ntours[i].sum()/Ntours[i].size
+
+    fig = plt.figure(figsize=(15,10))
+    plt.plot(k,N)
+    plt.xlabel("k")
+    plt.ylabel("Nombre de tours")
+    plt.title(f"Nombre de tour mis pour purger une piece de taille {taille} et densité {d}, en fonction de k, pour u={u} ({Nsim} simulations par pas, {Npas} pas de k, et k variant de {kmin} a {kmax})")
+    plt.show()
