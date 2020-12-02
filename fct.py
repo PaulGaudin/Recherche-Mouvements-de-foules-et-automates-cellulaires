@@ -326,7 +326,7 @@ def SimulationsU(d,taille,k,Npas,Nsim):
 @timer
 def SimulationsK(d,taille,u,kmin,kmax,Npas,Nsim):
     Terrains=np.asarray([creerSalle(d,taille[0],taille[1]) for i in range(Nsim)])
-    k=np.linspace(0,kmax,Npas)
+    k=np.linspace(kmin,kmax,Npas)
     Ntours=np.asarray([[resolv2(Terrain,kt,u) for Terrain in Terrains] for kt in k])
     N=np.zeros(Npas)
     for i in range(Npas):
@@ -361,7 +361,7 @@ def SimulationsUR(d,taille,k,Npas,Nsim):
 @timer
 def SimulationsKR(d,taille,u,kmin,kmax,Npas,Nsim):
     Terrains=np.asarray([creerSalle(d,taille[0],taille[1]) for i in range(Nsim)])
-    k=np.linspace(0,kmax,Npas)
+    k=np.linspace(kmin,kmax,Npas)
     Ntours=np.asarray([[resolv2(Terrain,kt,u) for Terrain in Terrains] for kt in k])
     N=np.zeros(Npas)
     for i in range(Npas):
