@@ -354,7 +354,7 @@ def SimulationsUR(d,taille,k,Npas,Nsim):
     plt.plot(u,N*0.27)
     plt.xlabel("U")
     plt.ylabel("Temps (en s)")
-    plt.title(f"Nombre de tour mis pour purger une piece de taille {taille*0.4} mètres et densité {d}, en fonction de u (coeff de friction), pour k={k} ({Nsim} simulations par pas, {Npas} pas de u)")
+    plt.title(f"Nombre de tour mis pour purger une piece de taille {taille[0]*0.4,taille[1]*0.4} mètres et densité {d}, en fonction de u (coeff de friction), pour k={k} ({Nsim} simulations par pas, {Npas} pas de u)")
     plt.show()
 
 
@@ -371,5 +371,5 @@ def SimulationsKR(d,taille,u,kmin,kmax,Npas,Nsim):
     plt.plot(k,N*0.27)
     plt.xlabel("k")
     plt.ylabel("Temps (en s)")
-    plt.title(f"Nombre de tour mis pour purger une piece de taille {taille*0.4} mètres et densité {d}, en fonction de k, pour u={u} ({Nsim} simulations par pas, {Npas} pas de k, et k variant de {kmin} a {kmax})")
+    plt.title(f"Nombre de tour mis pour purger une piece de taille {taille[0]*0.4,taille[1]*0.4} mètres et densité {d}, en fonction de k, pour u={u} ({Nsim} simulations par pas, {Npas} pas de k, et k variant de {kmin} a {kmax})")
     plt.show()
