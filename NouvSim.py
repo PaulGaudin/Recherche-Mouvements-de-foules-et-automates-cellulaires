@@ -1,3 +1,5 @@
+from fct import plotSalle,afficheSFF,Init,SFF,w,p,p2,Mouvement,update,friction,timer
+from base import *
 import numpy as np
 from random import randint
 
