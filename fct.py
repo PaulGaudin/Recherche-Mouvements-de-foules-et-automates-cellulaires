@@ -11,14 +11,14 @@ def plotSalle(S):
     cmap = matplotlib.colors.ListedColormap(['white','black',"red", "gray", "yellow"])
     boundaries = [-0.2, 0.5, 1.5, 2.5, 3.5, 4.5]
     norm = matplotlib.colors.BoundaryNorm(boundaries, cmap.N, clip=True)
-    plt.figure(figsize=(5,5))
+    plt.figure(figsize=(np.shape(S)[1]/2,np.shape(S)[0]/2))
     plt.pcolor(S,cmap=cmap,norm=norm)
     plt.show()
 
 #Creation d'une pièce remplit d'automate
 def creerSalle(densite,Ly,Lx):
-    ligneMur = [3]*(Ly+2)
-    colonneMur = [3]*Lx
+    ligneMur = [3]*(Lx+2)
+    colonneMur = [3]*Ly
     #rempli la salle avec des gens aleatoirement placés
     salle=np.random.binomial(1, densite, size=(Ly,Lx))
     
@@ -48,11 +48,11 @@ def afficheSFF(salle):
 
 #Initialisation de la pièce :
 def Init(Ly,Lx):
-    piece=np.zeros(shape=(Ly+2,Lx+2))
-    a=np.arange(piece[0].size)
-    b=np.arange(piece[0].size)*[0]
-    c=np.ones(piece[0].size).astype(np.int64)*[piece[0].size-1]
-    piece[a,b] = piece[b,a] = piece[a,c] = piece[c,a] = 3
+    piece=np.zeros(shape=(Ly,Lx))
+    ligneMur = [3]*(Lx+2)
+    colonneMur = [3]*Ly
+    piece = np.column_stack((colonneMur, piece, colonneMur))
+    piece = np.vstack((ligneMur, piece, ligneMur))
     piece[0,int(Lx/2)]=piece[0,int((Lx/2)+1)]=2
             
     return piece
@@ -62,11 +62,11 @@ def Init(Ly,Lx):
 def SFF(T):
     dx=0.4
     R=np.copy(T)
-    R=np.array([[max(abs(np.sqrt((((i-0.5)*dx-(((T[0].size-2)/2)-0.5)*dx)**2)+(((j-0.5)*dx)**2))),abs(np.sqrt((((i-0.5)*dx-(((T[0].size-1)/2)-0.5)*dx)**2)+(((j-0.5)*dx)**2)))) for i in range(T[0].size)] for j in range(T[0].size)])
-    a=np.arange(T[0].size)
-    b=np.arange(T[0].size)*[0]
-    c=np.ones(T[0].size).astype(np.int64)*[T[0].size-1]
-    R[a,b] = R[b,a] = R[a,c] = R[c,a] = 0
+    R=np.array([[max(abs(np.sqrt((((i-0.5)*dx-(((T[0].size-2)/2)-0.5)*dx)**2)+(((j-0.5)*dx)**2))),abs(np.sqrt((((i-0.5)*dx-(((T[0].size-1)/2)-0.5)*dx)**2)+(((j-0.5)*dx)**2)))) for i in range(1,np.shape(T)[1]-1)] for j in range(1,np.shape(T)[0]-1)])
+    ligneMur = [0]*np.shape(T)[1]
+    colonneMur = [0]*(np.shape(T)[0]-2)
+    R = np.column_stack((colonneMur, R, colonneMur))
+    R = np.vstack((ligneMur, R, ligneMur))
     return R
 
 
@@ -120,7 +120,6 @@ def Mouvement(x,y,k,TM,TS):
 
 #Fonction permettant de récuperer tout les mouvements des automates :
 def update(TM,TS,k):
-    TS=SFF(TM)
     x,y = np.where(TM==1)
     base=np.vstack([x,y]).T
     Mouv=np.array([Mouvement(x[i],y[i],k,TM,TS) for i in range(x.size)])
@@ -157,7 +156,7 @@ def Deplacement(TM,k,u):
     else:
         x,y=New.transpose()
         Temp[x,y]=1
-        Temp[0,int(TM.shape[0]/2)]=Temp[0,int((TM.shape[1]/2)-1)]=2
+        Temp[0,int(TM.shape[1]/2)]=Temp[0,int((TM.shape[1]/2)-1)]=2
         return Temp
 
 #Un timer
@@ -196,7 +195,7 @@ def resolution(TM,k,u):
     boundaries = [-0.2, 0.5, 1.5, 2.5, 3.5 ]
     norm = matplotlib.colors.BoundaryNorm(boundaries, cmap.N, clip=True)
 
-    fig, ax = plt.subplots(figsize=(5,5))
+    fig, ax = plt.subplots(figsize=(np.shape(TM)[1]/2,np.shape(TM)[0]/2))
     cax = ax.pcolormesh(np.array([[]]),cmap=cmap,norm=norm)
 
     def init():
@@ -229,7 +228,7 @@ def Deplacement2(TM,k,u):
     else:
         x,y=New.transpose()
         Temp[x,y]=1
-        Temp[0,int(TM.shape[0]/2)]=Temp[0,int((TM.shape[1]/2)-1)]=2
+        Temp[0,int(TM.shape[1]/2)]=Temp[0,int((TM.shape[1]/2)-1)]=2
         k=0
                     
         #On veut maintenant reinjecter le nombre de personnes sortantes dans Temp vers le fond
@@ -272,7 +271,7 @@ def resolution2(TM,k,u):
     boundaries = [-0.2, 0.5, 1.5, 2.5, 3.5]
     norm = matplotlib.colors.BoundaryNorm(boundaries, cmap.N, clip=True)
 
-    fig, ax = plt.subplots(figsize=(5,5))
+    fig, ax = plt.subplots(figsize=(np.shape(TM)[1]/2,np.shape(TM)[0]/2))
     cax = ax.pcolormesh(np.array([[]]),cmap=cmap,norm=norm)
 
     def init():
