@@ -306,6 +306,8 @@ def resolv2(TM,k,u):
         Nb+=1
     return Nb-Na
 
+
+
 @timer    
 def SimulationsU(d,taille,k,Npas,Nsim):
     Terrains=np.asarray([creerSalle(d,taille[0],taille[1]) for i in range(Nsim)])
@@ -323,21 +325,54 @@ def SimulationsU(d,taille,k,Npas,Nsim):
     plt.show()
 
 
+def ecartType(tableau):
+    #On défini la moyenne du tableau:
+    moy=0
+    for i in range(len(tableau)):
+        moy=moy+tableau[i]
+    moy=moy/len(tableau)
+    #On definit la variance
+    varTableau=0
+    for i in range(len(tableau)):
+        varTableau=varTableau + (tableau[i]-moy)**2
+
+    varTableau=varTableau/len(tableau)
+
+    #Puis on retourn l'écart type qui est la racine carrée de la variance
+    return np.sqrt(varTableau)
+
+
 @timer
 def SimulationsK(d,taille,u,kmin,kmax,Npas,Nsim):
     Terrains=np.asarray([creerSalle(d,taille[0],taille[1]) for i in range(Nsim)])
     k=np.linspace(kmin,kmax,Npas)
     Ntours=np.asarray([[resolv2(Terrain,kt,u) for Terrain in Terrains] for kt in k])
     N=np.zeros(Npas)
+    ecart=np.zeros(Npas)
+
     for i in range(Npas):
         N[i]=Ntours[i].sum()/Ntours[i].size
+        print(Ntours[i])
+        ecart[i]=ecartType(Ntours[i])
+
+    
 
     fig = plt.figure(figsize=(15,10))
     plt.plot(k,N)
     plt.xlabel("k")
     plt.ylabel("Nombre de tours")
     plt.title(f"Nombre de tour mis pour purger une piece de taille {taille} et densité {d}, en fonction de k, pour u={u} ({Nsim} simulations par pas, {Npas} pas de k, et k variant de {kmin} a {kmax})")
+    plt.errorbar(k, N, yerr=ecart, fmt = 'none', capsize = 10, ecolor = 'red', zorder = 1)
     plt.show()
+
+
+
+
+
+
+
+
+
 
 
 
