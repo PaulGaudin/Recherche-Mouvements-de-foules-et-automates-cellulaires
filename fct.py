@@ -32,39 +32,6 @@ def creerSalle(densite,Ly,Lx):
     return salle
 
 
-#Creation d'une salle remplie d'automates dont on choisi le nombre
-def Creeralle2(nb, Ly, Lx): #Attention, nb doit etre inferieur à (Lx)*(Ly)
-    ligneMur = [3]*(Ly+2)
-    colonneMur = [3]*Lx
-    #Rempli la salle avec un nombre nb de gens
-    salle=np.zeros((Ly, Lx))
-    x_reinjection_min=(len(salle)-1)
-    x_reinjection_max=0
-    y_reinjection_min=0
-    y_reinjection_max=len(TM-1)
-
-    new_x=new_y=0
-    for i in range(nb):
-        new_x=randint(x_reinjection_min, x_reinjection_max)
-        new_y=randint(y_reinjection_min, y_reinjection_max)
-        
-        while(salle[new_x,new_y]!=0):
-            new_x=randint(x_reinjection_min, x_reinjection_max)
-            new_y=randint(y_reinjection_min, y_reinjection_max) 
-
-        salle[new_x,new_y]=1
-            
-
-    #créer des murs en gris
-    salle = np.column_stack((colonneMur, salle, colonneMur))
-    salle = np.vstack((ligneMur, salle, ligneMur))
-
-    #créer une porte representée en rouge
-    salle[0,int(Lx/2)]=2
-    salle[0,int((Lx-1)/2)]=2
-    return salle
-
-
 
 #Afficher SFF
 def afficheSFF(salle):
