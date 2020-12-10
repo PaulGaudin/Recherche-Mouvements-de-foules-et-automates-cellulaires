@@ -485,4 +485,33 @@ def faisTourner(nbP, taille, k, u, nbSim ):
     return temps
 
 
-#def etudeStat(liste):
+def etudeStat(tableau):
+
+    #On défini la moyenne du tableau:
+    moy=0
+    for i in range(len(tableau)):
+        moy=moy+tableau[i]
+    moy=moy/len(tableau)
+
+    #On definit la variance
+    var=0
+    for i in range(len(tableau)):
+        var=var + (tableau[i]-moy)**2
+    var=var/len(tableau)
+
+    #Puis on retourn l'écart type qui est la racine carrée de la variance
+    ecart=np.sqrt(var)    
+
+    #quartils
+    quartils=[]
+    quartils.append(np.quantile(arr, .25))
+    quartils.append(np.quantile(arr, .50))
+    quartils.append(np.quantile(arr, .75))
+    #mediane
+    mediane=np.median(tableau)
+    #max
+    max=np.max(tableau)
+    #min
+    min=np.min(tableau)
+
+    return len(tableau), moy, var, ecart #retourne, le nb de valeurs, la moyenne, la variance, l'écart type
