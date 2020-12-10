@@ -454,44 +454,35 @@ def resolutionSansVideo(TM,k,u):
         TM=Deplacement(TM,k,u)
         evol.append(TM)
         Nb+=1
-
-    #cmap = matplotlib.colors.ListedColormap(['white','black',"red", "gray"])
-    #boundaries = [-0.2, 0.5, 1.5, 2.5, 3.5 ]
-    #norm = matplotlib.colors.BoundaryNorm(boundaries, cmap.N, clip=True)
-
-    #fig, ax = plt.subplots(figsize=(5,5))
-    #cax = ax.pcolormesh(np.array([[]]),cmap=cmap,norm=norm)
-
-    #def init():
-        #cax = ax.pcolormesh(evol[0],cmap=cmap,norm=norm)
-        #return cax
-
-    #def animate(i):
-        #cax = ax.pcolormesh(evol[i],cmap=cmap,norm=norm)
-        
-        #ax.set_title(f"Tour numéro {i}, il reste {np.sum(evol[i]==1)} automates")
-        #return cax
-
-    #ani = animation.FuncAnimation(fig, animate, init_func=init, frames=Nb, interval=200, blit=False)
-
-    #video = HTML(ani.to_html5_video())
-    #plt.show()
-    #plt.clf()
     return Nb
 
 #fct qui fait tourner un certain nbr de fois resolution 1 pour une piece creée avec creerSalle mais qui ne l'affiche pas
 def faisTourner(nbP, taille, k, u, nbSim ):
     temps=[]  
-    while(nbSim!=0):
+    for i in range(nbSim):
         TM=creerSalle2(nbP, taille[0], taille[1])
         #resolution(TM, k, u) renvoi le nombre de tours que prend la resolution pour que tout le monde sorte
         temps.append((resolutionSansVideo(TM, k, u))*0.27)
+        #ce qui suit sert a visualiser l'avancée du programme dans la compilation
+        if((i%10)==0):
+            print("itérations n°",i)
+
     
-    print(temps)
-    plt.hist(temps, range = (0, nbSim), bins = nbSim, color = 'blue', edgecolor = 'red')
-    plt.xlabel('numero de simulations')
-    plt.ylabel('temps de sortie en secondes')
+    max=np.max(temps)
+    min=np.min(temps)
+    #On creer un nombre qui est l'inteier directeent superieur à max_temps
+    sup=int(max)+1
+    inf=int(min)
+    
+    print(max)
+    print(min)
+    plt.hist(temps, range = (inf, sup), bins = ((sup-inf)*10), color = 'blue')
+    plt.xlabel('temps en secondes')
+    plt.ylabel('nombre de simulation atteigant le même temps de sorti')
     plt.title(f"Temps du dernier sorti d'une piece {taille[0], taille[1]}, pour {nbP} personnes initiales, pour k={k} et u={u}, pour {nbSim} simulations")
     plt.show()
 
-    
+    return temps
+
+
+#def etudeStat(liste):
