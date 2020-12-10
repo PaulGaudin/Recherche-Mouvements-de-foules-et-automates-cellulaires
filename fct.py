@@ -38,28 +38,25 @@ def creerSalle2(nb, Ly, Lx): #Attention, nb doit etre inferieur à (Lx)*(Ly)
     colonneMur = [3]*Lx
     #Rempli la salle avec un nombre nb de gens
     salle=np.zeros((Ly, Lx))
-    print(len(salle))
+    
     
     x_reinjection_min=0
     x_reinjection_max=(len(salle)-1)
     y_reinjection_min=0
-    y_reinjection_max=len(salle-1)
+    y_reinjection_max=(len(salle)-1)
 
-    print(x_reinjection_min=0)
-    print(x_reinjection_max=(len(salle)-1))
-    print(y_reinjection_min=0)
-    print(y_reinjection_max=len(salle-1))
-    new_x=new_y=0
-    for i in range(nb):
+    new_x=0
+    new_y=0
+    while(nb!=0):
         new_x=randint(x_reinjection_min, x_reinjection_max)
         new_y=randint(y_reinjection_min, y_reinjection_max)
         
-        while(salle[new_x,new_y]!=0):
+        while(salle[new_x,new_y]==1):
             new_x=randint(x_reinjection_min, x_reinjection_max)
             new_y=randint(y_reinjection_min, y_reinjection_max) 
 
         salle[new_x,new_y]=1
-            
+        nb=nb-1   
 
     #créer des murs en gris
     salle = np.column_stack((colonneMur, salle, colonneMur))
@@ -446,3 +443,55 @@ def SimulationsKR(d,taille,u,kmin,kmax,Npas,Nsim):
     plt.title(f"Nombre de tour mis pour purger une piece de taille {taille[0]*0.4,taille[1]*0.4} mètres et densité {d}, en fonction de k, pour u={u} ({Nsim} simulations par pas, {Npas} pas de k, et k variant de {kmin} a {kmax})")
     plt.errorbar(k, N*0.27, yerr=ecart, fmt = 'none', capsize = 10, ecolor = 'red', zorder = 1)
     plt.show()
+
+
+
+#Affiche chaque tour jusqu'a ce que tout les automates soient sortis
+def resolutionSansVideo(TM,k,u):
+    evol=[TM]
+    Nb=0
+    while((TM==Init(TM.shape[0]-2,TM.shape[1]-2)).all()!=1):
+        TM=Deplacement(TM,k,u)
+        evol.append(TM)
+        Nb+=1
+
+    #cmap = matplotlib.colors.ListedColormap(['white','black',"red", "gray"])
+    #boundaries = [-0.2, 0.5, 1.5, 2.5, 3.5 ]
+    #norm = matplotlib.colors.BoundaryNorm(boundaries, cmap.N, clip=True)
+
+    #fig, ax = plt.subplots(figsize=(5,5))
+    #cax = ax.pcolormesh(np.array([[]]),cmap=cmap,norm=norm)
+
+    #def init():
+        #cax = ax.pcolormesh(evol[0],cmap=cmap,norm=norm)
+        #return cax
+
+    #def animate(i):
+        #cax = ax.pcolormesh(evol[i],cmap=cmap,norm=norm)
+        
+        #ax.set_title(f"Tour numéro {i}, il reste {np.sum(evol[i]==1)} automates")
+        #return cax
+
+    #ani = animation.FuncAnimation(fig, animate, init_func=init, frames=Nb, interval=200, blit=False)
+
+    #video = HTML(ani.to_html5_video())
+    #plt.show()
+    #plt.clf()
+    return Nb
+
+#fct qui fait tourner un certain nbr de fois resolution 1 pour une piece creée avec creerSalle mais qui ne l'affiche pas
+def faisTourner(nbP, taille, k, u, nbSim ):
+    temps=[]  
+    while(nbSim!=0):
+        TM=creerSalle2(nbP, taille[0], taille[1])
+        #resolution(TM, k, u) renvoi le nombre de tours que prend la resolution pour que tout le monde sorte
+        temps.append((resolutionSansVideo(TM, k, u))*0.27)
+    
+    print(temps)
+    plt.hist(temps, range = (0, nbSim), bins = nbSim, color = 'blue', edgecolor = 'red')
+    plt.xlabel('numero de simulations')
+    plt.ylabel('temps de sortie en secondes')
+    plt.title(f"Temps du dernier sorti d'une piece {taille[0], taille[1]}, pour {nbP} personnes initiales, pour k={k} et u={u}, pour {nbSim} simulations")
+    plt.show()
+
+    
