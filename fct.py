@@ -475,23 +475,44 @@ def faisTourner(nbP, taille, k, u, nbSim ):
     inf=int(min)
 
 
+<<<<<<< Updated upstream
     nbValeurs, moy, mediane, quartils, var, ecart = etudeStat(temps)
+=======
+    #nbValeurs, moy, mediane, quartils, var, ecart = etudeStat(temps)
+>>>>>>> Stashed changes
     
 
        
 
     plt.figure(1)
     plt.hist(temps, range = (inf, sup), bins = ((sup-inf)*10), color = 'blue')
+<<<<<<< Updated upstream
     plt.title(f"Temps du dernier sorti d'une piece {taille[0]*0.4, taille[1]*0.4}en m, pour {nbP} personnes initiales, pour k={k} et u={u}, pour {nbSim} simulations")
+=======
+    plt.title(f"Temps du dernier sorti d'une piece {taille[0], taille[1]}, pour {nbP} personnes initiales, pour k={k} et u={u}, pour {nbSim} simulations")
+>>>>>>> Stashed changes
     plt.xlabel("temps en secondes")
     plt.ylabel("nombre de simulation atteigant le même temps de sorti")
 
     plt.figure(2)
+<<<<<<< Updated upstream
     plt.figtext(0.05, 0.3, f'ETUDE STATISTIQUE \n  \n Nombre de valeurs: {nbValeurs} \n \n Moyenne={moy}s \n  \n Mediane={mediane}s \n  \n Variance={var} \n  \n Ecart Type={ecart}s  \n  \n Premier quartils={quartils[0]}s \n  \n Deuxième quartils={quartils[1]}s \n  \n Troisième quartils={quartils[2]}s' )
     plt.annotate('1er point', xy = (0, 0), xytext = (1, 0), arrowprops = {'facecolor': 'yellow', 'edgecolor': 'red','width': 3, 'headwidth': 15,'shrink': 0.2}, color = 'green', backgroundcolor = 'pink')
     plt.axis("off")
+=======
+    
+    plt.text(5, 8, 'histogramme ....', style = 'italic', fontweight = 'bold', fontsize = 20, family = 'serif', rotation = 10)
+    pyplot.text(1, 2, 'my text', horizontalalignment = 'center', verticalalignment = 'center')
+    pyplot.figtext(0.1, 0.7, 'texte sur toute la figure')
+    pyplot.annotate('1er point', xy = (0, 0), xytext = (1, 0), arrowprops = {'facecolor': 'yellow', 'edgecolor': 'red','width': 3, 'headwidth': 15,'shrink': 0.2}, color = 'green', backgroundcolor = 'pink')
+    #plt.axis("off")
+>>>>>>> Stashed changes
     plt.plot()
     plt.show()
+
+
+    
+    
 
     return temps
 
@@ -520,4 +541,19 @@ def etudeStat(tableau):
     
 
     return len(tableau), moy, mediane, quartils, var, ecart #retourne, le nb de valeurs, la moyenne, la variance, l'écart type
+<<<<<<< Updated upstream
 
+=======
+
+
+def test():
+    x = np.arange(0,4,0.2)
+    y = np.exp(x)
+
+    plt.text(1,35,'Hello World !')
+
+    plt.grid()
+    plt.plot(x,y)
+
+    plt.show()
+>>>>>>> Stashed changes
