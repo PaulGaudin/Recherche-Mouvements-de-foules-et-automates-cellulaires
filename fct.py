@@ -473,13 +473,24 @@ def faisTourner(nbP, taille, k, u, nbSim ):
     #On creer un nombre qui est l'inteier directeent superieur à max_temps
     sup=int(max)+1
     inf=int(min)
+
+
+    nbValeurs, moy, mediane, quartils, var, ecart = etudeStat(temps)
     
-    print(max)
-    print(min)
+
+       
+
+    plt.figure(1)
     plt.hist(temps, range = (inf, sup), bins = ((sup-inf)*10), color = 'blue')
-    plt.xlabel('temps en secondes')
-    plt.ylabel('nombre de simulation atteigant le même temps de sorti')
-    plt.title(f"Temps du dernier sorti d'une piece {taille[0], taille[1]}, pour {nbP} personnes initiales, pour k={k} et u={u}, pour {nbSim} simulations")
+    plt.title(f"Temps du dernier sorti d'une piece {taille[0]*0.4, taille[1]*0.4}en m, pour {nbP} personnes initiales, pour k={k} et u={u}, pour {nbSim} simulations")
+    plt.xlabel("temps en secondes")
+    plt.ylabel("nombre de simulation atteigant le même temps de sorti")
+
+    plt.figure(2)
+    plt.figtext(0.05, 0.3, f'ETUDE STATISTIQUE \n  \n Nombre de valeurs: {nbValeurs} \n \n Moyenne={moy}s \n  \n Mediane={mediane}s \n  \n Variance={var} \n  \n Ecart Type={ecart}s  \n  \n Premier quartils={quartils[0]}s \n  \n Deuxième quartils={quartils[1]}s \n  \n Troisième quartils={quartils[2]}s' )
+    plt.annotate('1er point', xy = (0, 0), xytext = (1, 0), arrowprops = {'facecolor': 'yellow', 'edgecolor': 'red','width': 3, 'headwidth': 15,'shrink': 0.2}, color = 'green', backgroundcolor = 'pink')
+    plt.axis("off")
+    plt.plot()
     plt.show()
 
     return temps
@@ -492,26 +503,21 @@ def etudeStat(tableau):
     for i in range(len(tableau)):
         moy=moy+tableau[i]
     moy=moy/len(tableau)
-
     #On definit la variance
     var=0
     for i in range(len(tableau)):
         var=var + (tableau[i]-moy)**2
     var=var/len(tableau)
-
     #Puis on retourn l'écart type qui est la racine carrée de la variance
     ecart=np.sqrt(var)    
-
     #quartils
     quartils=[]
-    quartils.append(np.quantile(arr, .25))
-    quartils.append(np.quantile(arr, .50))
-    quartils.append(np.quantile(arr, .75))
+    quartils.append(np.quantile(tableau, .25))
+    quartils.append(np.quantile(tableau, .50))
+    quartils.append(np.quantile(tableau, .75))
     #mediane
     mediane=np.median(tableau)
-    #max
-    max=np.max(tableau)
-    #min
-    min=np.min(tableau)
+    
 
-    return len(tableau), moy, var, ecart #retourne, le nb de valeurs, la moyenne, la variance, l'écart type
+    return len(tableau), moy, mediane, quartils, var, ecart #retourne, le nb de valeurs, la moyenne, la variance, l'écart type
+
