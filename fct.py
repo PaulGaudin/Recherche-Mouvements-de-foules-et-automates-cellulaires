@@ -475,7 +475,7 @@ def faisTourner(nbP, taille, k, u, nbSim ):
     nbValeurs, moy, mediane, quartils, var, ecart = etudeStat(temps)
 
     plt.figure(1)
-    plt.hist(temps, range = (inf, sup), bins = ((sup-inf)*10), color = 'blue')
+    plt.hist(temps, range = (inf, sup), bins = ((sup-inf)), color = 'blue')
     plt.title(f"Temps du dernier sorti d'une piece {taille[0]*0.4, taille[1]*0.4}en m, pour {nbP} personnes initiales, pour k={k} et u={u}, pour {nbSim} simulations")
     plt.xlabel("temps en secondes")
     plt.ylabel("nombre de simulation atteigant le même temps de sorti")
