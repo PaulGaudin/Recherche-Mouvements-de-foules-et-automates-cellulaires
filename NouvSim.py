@@ -51,7 +51,7 @@ def resolutionSansVideo(TM,k,u):
 def faisTourner(nbP, taille, k, u, nbSim ):
     temps=[]  
     for i in range(nbSim):
-        TM=creerSalle2(nbP, taille[0], taille[1])
+        TM=creerSalle(nbP, taille[0], taille[1])
         #resolution(TM, k, u) renvoi le nombre de tours que prend la resolution pour que tout le monde sorte
         temps.append((resolutionSansVideo(TM, k, u))*0.27)
         #ce qui suit sert a visualiser l'avancée du programme dans la compilation
