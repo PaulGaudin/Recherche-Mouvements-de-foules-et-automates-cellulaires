@@ -8,7 +8,7 @@ from random import randint
 
 #Fonction effectuant un déplacement complet de tout les automates en parallèle (méthode de friction): 
 def Deplacement(TM,k,u):
-    New=friction(TM,k,u)
+    New,compte=friction(TM,k,u)
     Temp=Init(TM.shape[0]-2,TM.shape[1]-2)
 
 
@@ -43,7 +43,7 @@ def Deplacement(TM,k,u):
             Temp[new_x,new_y]=1
             k+=1
     
-    return Temp,k
+    return Temp,k,compte
 
 
 def resolution(TM,k,u):
@@ -52,7 +52,7 @@ def resolution(TM,k,u):
     X=np.sum(TM==1)*2
     NStop=0
     while((TM==Init(TM.shape[0]-2,TM.shape[1]-2)).all()!=1 and NStop<X):
-        TM,n=Deplacement(TM,k,u)
+        TM,n,compte=Deplacement(TM,k,u)
         NStop+=n
         evol.append(TM)
         Nb+=1
@@ -71,7 +71,7 @@ def resolution(TM,k,u):
     def animate(i):
         cax = ax.pcolormesh(evol[i],cmap=cmap,norm=norm)
         
-        ax.set_title(f"Tour numéro {i}, il reste {np.sum(evol[i]==1)} automates")
+        ax.set_title(f"Tour numéro {i}, il reste {np.sum(evol[i]==1)} automates, et {compte} friction")
         return cax
 
     ani = animation.FuncAnimation(fig, animate, init_func=init, frames=Nb, interval=200, blit=False)
@@ -88,7 +88,7 @@ def resolv(TM,k,u):
     NStop=0
     Na=0
     while((TM==Init(TM.shape[0]-2,TM.shape[1]-2)).all()!=1 and NStop<(X*3)):
-        TM,n=Deplacement(TM,k,u)
+        TM,n,compte=Deplacement(TM,k,u)
         NStop+=n
         if(NStop==(X*2)):
             Na=Nb
