@@ -64,6 +64,7 @@ def SimulationsK(d,taille,u,kmin,kmax,Npas,Nsim):
     plt.title(f"Nombre de tour mis pour purger une piece de taille {taille} et densité {d}, en fonction de k, pour u={u} ({Nsim} simulations par pas, {Npas} pas de k, et k variant de {kmin} a {kmax})")
     plt.errorbar(k, N, yerr=ecart, fmt = 'none', capsize = 10, ecolor = 'red', zorder = 1)
     plt.show()
+    return Ntours
 
 @timer    
 def SimulationsUR(d,taille,k,Npas,Nsim):
