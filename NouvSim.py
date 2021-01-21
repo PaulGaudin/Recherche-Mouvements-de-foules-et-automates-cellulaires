@@ -41,7 +41,7 @@ def resolutionSansVideo(TM,k,u):
     evol=[TM]
     Nb=0
     while((TM==Init(TM.shape[0]-2,TM.shape[1]-2)).all()!=1):
-        TM=Deplacement(TM,k,u)
+        TM,A=Deplacement(TM,k,u)
         evol.append(TM)
         Nb+=1
     return Nb
@@ -102,3 +102,46 @@ def etudeStat(tableau):
     
 
     return len(tableau), moy, mediane, quartils, var, ecart #retourne, le nb de valeurs, la moyenne, la variance, l'écart type
+
+def ecartType(tableau):
+    #On défini la moyenne du tableau:
+    moy=0
+    for i in range(len(tableau)):
+        moy=moy+tableau[i]
+    moy=moy/len(tableau)
+    #On definit la variance
+    varTableau=0
+    for i in range(len(tableau)):
+        varTableau=varTableau + (tableau[i]-moy)**2
+
+    varTableau=varTableau/len(tableau)
+
+    #Puis on retourn l'écart type qui est la racine carrée de la variance
+    return np.sqrt(varTableau)
+
+@timer
+def SimulationsK(Nb,taille,u,kmin,kmax,Npas,Nsim):
+    Terrains=np.asarray([creerSalle(Nb,taille[0],taille[1]) for i in range(Nsim)])
+    k=np.linspace(kmin,kmax,Npas)
+    Result=np.asarray([[resolv(Terrain,kt,u) for Terrain in Terrains] for kt in k])
+    N=np.zeros(Npas)
+    compte=np.zeros(Npas)
+    ecart=np.zeros(Npas)
+
+    for i in range(Npas):
+        Ntours,A=Result.T
+        Ntours=Ntours.T
+        A=A.T
+        N[i]=Ntours[i].sum()/Ntours[i].size
+        compte[i]=A[i].sum()/A[i].size
+        ecart[i]=ecartType(Ntours[i])
+
+    fig = plt.figure(figsize=(15,10))
+    plt.plot(k,N)
+    plt.xlabel("k")
+    plt.ylabel("Nombre de tours")
+    plt.title(f"Nombre de tour mis pour purger une piece de taille {taille} et contenant {Nb} automates, en fonction de k, pour u={u} ({Nsim} simulations par pas, {Npas} pas de k, et k variant de {kmin} a {kmax})")
+    plt.errorbar(k, N, yerr=ecart, fmt = 'none', capsize = 10, ecolor = 'red', zorder = 1)
+    plt.show()
+    plt.figure(figsize=(15,10))
+    return compte
