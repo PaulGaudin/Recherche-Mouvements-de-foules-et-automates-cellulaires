@@ -78,7 +78,19 @@ def Mouvement(x,y,k1,k2,TM,TS):
 
 
 def update(TM,TS,k1,k2):
-    x,y = np.concatenate((np.where(TM==1),np.where(TM==4)),axis=1)
+    A=np.where(TM!=0)
+    B=np.where(TM==3)
+    C=np.where(TM==2)
+    print("A= ",A,"\n\n B= ",B,"\n\n C= ",C)
+    A=np.array([A[0],A[1]])
+    B=np.array([B[0],B[1]])
+    C=np.array([C[0],C[1]])
+    A=A.transpose()
+    print("A= ",A,"\n\n B= ",B,"\n\n C= ",C)
+    D=np.concatenate((B,C),axis=1).T
+    E=np.setdiff1d(D,A)
+    print("\n\n D= ",D,"\n\n E= ",E)
+    #x,y = np.concatenate((np.where(TM==1),np.where(TM==4)),axis=1)
     k=TM[x,y]
     base=np.vstack([x,y,k]).T
     Mouv=np.array([Mouvement(x[i],y[i],k1,k2,TM,TS) for i in range(x.size)])
@@ -89,10 +101,10 @@ def update(TM,TS,k1,k2):
 def friction(TM,k1,k2,u):
     TS=SFF(TM)
     M,B = update(TM,TS,k1,k2)
-    M=M[np.lexsort(([M[:, i] for i in range(M.shape[1]-1, -1, -1)]))]
-    M=M[M[:,0].argsort(kind='mergesort')]
-    B=B[np.lexsort(([B[:, i] for i in range(B.shape[1]-1, -1, -1)]))]
-    B=B[B[:,0].argsort(kind='mergesort')]
+    #M=M[np.lexsort(([M[:, i] for i in range(M.shape[1]-1, -1, -1)]))]
+    #M=M[M[:,0].argsort(kind='mergesort')]
+    #B=B[np.lexsort(([B[:, i] for i in range(B.shape[1]-1, -1, -1)]))]
+    #B=B[B[:,0].argsort(kind='mergesort')]
     #B=B[B[:,0].argsort(kind='mergesort')]
     A=M.copy()
     M1=M[:,0:2]
