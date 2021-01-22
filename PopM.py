@@ -78,7 +78,6 @@ def Mouvement(x,y,k1,k2,TM,TS):
 
 
 def update(TM,TS,k1,k2):
-    TS=SFF(TM)
     x,y = np.concatenate((np.where(TM==1),np.where(TM==4)),axis=1)
     k=TM[x,y]
     base=np.vstack([x,y,k]).T
@@ -90,9 +89,17 @@ def update(TM,TS,k1,k2):
 def friction(TM,k1,k2,u):
     TS=SFF(TM)
     M,B = update(TM,TS,k1,k2)
+    M=M[np.lexsort(([M[:, i] for i in range(M.shape[1]-1, -1, -1)]))]
+    M=M[M[:,0].argsort(kind='mergesort')]
+    B=B[np.lexsort(([B[:, i] for i in range(B.shape[1]-1, -1, -1)]))]
+    B=B[B[:,0].argsort(kind='mergesort')]
+    #B=B[B[:,0].argsort(kind='mergesort')]
+    A=M.copy()
+    M1=M[:,0:2]
+    M1=M1.astype(np.int64)
     M=M.astype(np.int64)
     B=B.astype(np.int64)
-    unique,indices,count=np.unique(M,return_inverse=True,return_counts=True,axis=0)
+    unique,indices,count=np.unique(M1,return_inverse=True,return_counts=True,axis=0)
     if(not (count==np.ones(count.size)).all()):
         I=np.where(count>1)[0]
         for i in I:
@@ -121,27 +128,27 @@ def Deplacement(TM,k1,k2,Ppop,u):
         Temp[x,y]=K
         Temp[0,int(TM.shape[0]/2)]=Temp[0,int((TM.shape[1]/2)-1)]=2
         k=0
-        A=K[np.where(x==0)]
-                    
         #On veut maintenant reinjecter le nombre de personnes sortantes dans Temp vers le fond
-        #On creer un espace de coordonées ou reinjecter les personnes = 2 bandes au fond de la salle
+        #On creer un espace de coordonées où reinjecter les personnes = 2 bandes au fond de la salle
         x_reinjection_min=(len(TM)-1)-3
         x_reinjection_max=(len(TM)-1)-1
 
         y_reinjection_min=1
         y_reinjection_max=len(TM-1)-2
 
-        while((np.sum(TM==1)+np.sum(TM==4))!=(np.sum(Temp==1)+np.sum(Temp==4))): 
+        while((np.sum(TM==0))!=(np.sum(Temp==0))): 
 
 
-            #Pour chaque personne a reinjecter, on choisit des coordonées au hasard dans la rectangle de respawn
+            #Pour chaque personne a reinjectée, on choisit des coordonées au hasard dans la rectangle de respawn
             new_x=new_y=0
+            new_x=randint(x_reinjection_min, x_reinjection_max)
+            new_y=randint(y_reinjection_min, y_reinjection_max)
 
             while(Temp[new_x,new_y]!=0):
-                new_x=new_y=0
                 new_x=randint(x_reinjection_min, x_reinjection_max)
-                new_y=randint(y_reinjection_min, y_reinjection_max) 
-
+                new_y=randint(y_reinjection_min, y_reinjection_max)
+                print('c')
+            
             Temp[new_x,new_y]=1+np.random.binomial(1, Ppop, size=None)*3
             k+=1
     
