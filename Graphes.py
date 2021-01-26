@@ -27,7 +27,7 @@ def SimulationsU(d,taille,k,Npas,Nsim):
     plt.errorbar(u, N, yerr=ecart, fmt = 'none', capsize = 10, ecolor = 'red', zorder = 1)
     plt.show()
 
-@timer
+
 def ecartType(tableau):
     #On défini la moyenne du tableau:
     moy=0
