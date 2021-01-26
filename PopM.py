@@ -6,6 +6,7 @@ import timeit
 from random import uniform
 from matplotlib import animation, rc
 from random import randint
+from Graphes import ecartType
 
 def creerSalle(densite,ProportionPop,Ly,Lx):
     ligneMur = [3]*(Ly+2)
@@ -24,7 +25,7 @@ def creerSalle(densite,ProportionPop,Ly,Lx):
 
     #créer une porte representée en rouge
     salle[0,int(Lx/2)]=2
-    salle[0,int((Lx-1)/2)]=2
+    salle[0,int((Lx+2)/2)]=2
     return salle
 
 #Fonction alternative calculant directement le poids d'une direction a partir des coordonnées de base et de la direction:
@@ -78,19 +79,7 @@ def Mouvement(x,y,k1,k2,TM,TS):
 
 
 def update(TM,TS,k1,k2):
-    A=np.where(TM!=0)
-    B=np.where(TM==3)
-    C=np.where(TM==2)
-    print("A= ",A,"\n\n B= ",B,"\n\n C= ",C)
-    A=np.array([A[0],A[1]])
-    B=np.array([B[0],B[1]])
-    C=np.array([C[0],C[1]])
-    A=A.transpose()
-    print("A= ",A,"\n\n B= ",B,"\n\n C= ",C)
-    D=np.concatenate((B,C),axis=1).T
-    E=np.setdiff1d(D,A)
-    print("\n\n D= ",D,"\n\n E= ",E)
-    #x,y = np.concatenate((np.where(TM==1),np.where(TM==4)),axis=1)
+    x,y = np.concatenate((np.where(TM==1),np.where(TM==4)),axis=1)
     k=TM[x,y]
     base=np.vstack([x,y,k]).T
     Mouv=np.array([Mouvement(x[i],y[i],k1,k2,TM,TS) for i in range(x.size)])
@@ -101,17 +90,16 @@ def update(TM,TS,k1,k2):
 def friction(TM,k1,k2,u):
     TS=SFF(TM)
     M,B = update(TM,TS,k1,k2)
-    #M=M[np.lexsort(([M[:, i] for i in range(M.shape[1]-1, -1, -1)]))]
-    #M=M[M[:,0].argsort(kind='mergesort')]
-    #B=B[np.lexsort(([B[:, i] for i in range(B.shape[1]-1, -1, -1)]))]
-    #B=B[B[:,0].argsort(kind='mergesort')]
-    #B=B[B[:,0].argsort(kind='mergesort')]
-    A=M.copy()
-    M1=M[:,0:2]
-    M1=M1.astype(np.int64)
+    Mt=np.vstack([M.T,np.arange(np.shape(M)[0])]).T
+    Mt=Mt[np.lexsort(([Mt[:, i] for i in range(Mt.shape[1]-1, -1, -1)]))]
+    C=B.copy()
+    Ind=Mt[:,3:4].T
+    Ind=Ind.astype(np.int64)
+    B=C[Ind[0]]
+    M=Mt[:,0:3]
     M=M.astype(np.int64)
     B=B.astype(np.int64)
-    unique,indices,count=np.unique(M1,return_inverse=True,return_counts=True,axis=0)
+    unique,indices,count=np.unique(M,return_inverse=True,return_counts=True,axis=0)
     if(not (count==np.ones(count.size)).all()):
         I=np.where(count>1)[0]
         for i in I:
@@ -123,7 +111,7 @@ def friction(TM,k1,k2,u):
                 elif(p2(B[J[j],0],B[J[j],1],k1,k2,TM,TS,M[J[j],0],M[J[j],1])>p2(B[J[j+1],0],B[J[j+1],1],k1,k2,TM,TS,M[J[j+1],0],M[J[j+1],1])):
                     M[J[j+1]]=B[J[j+1]].copy()
                 else:
-                    M[J[j]]=B[J[j]].copy()               
+                    M[J[j]]=B[J[j]].copy()
     return M
 
 
@@ -159,13 +147,11 @@ def Deplacement(TM,k1,k2,Ppop,u):
             while(Temp[new_x,new_y]!=0):
                 new_x=randint(x_reinjection_min, x_reinjection_max)
                 new_y=randint(y_reinjection_min, y_reinjection_max)
-                print('c')
             
             Temp[new_x,new_y]=1+np.random.binomial(1, Ppop, size=None)*3
             k+=1
     
     return Temp,k
-
 
 def resolution(d,taille,Ppop,k1,k2,u):
     TM=creerSalle(d,Ppop,taille[0],taille[1])
@@ -217,3 +203,27 @@ def resolv(d,taille,Ppop,k1,k2,u):
             Na=Nb
         Nb+=1
     return Nb-Na
+
+
+def SimulationsPpop(d,taille,u,k1,k2,Npas,Nsim):
+    p=np.linspace(0,1,Npas)
+    #Terrains=np.asarray([creerSalle(d,pt,taille[0],taille[1]) for pt in p])
+    Ntours=np.asarray([[resolv(d,taille,pt,k1,k2,u) for i in range(Nsim)] for pt in p])
+    print('c')
+    N=np.zeros(Npas)
+    ecart=np.zeros(Npas)
+
+    for i in range(Npas):
+        print('a')
+        N[i]=Ntours[i].sum()/Ntours[i].size
+        ecart[i]=ecartType(Ntours[i])
+
+    print('b')
+    fig = plt.figure(figsize=(15,10))
+    plt.plot(p,N)
+    plt.xlabel("Proportion de population (0 équivaut a que une population 1 et 1 équivaut a que une population 2")
+    plt.ylabel("Nombre de tours")
+    plt.title(f"Nombre de tour mis pour purger une piece de taille {taille} et densité {d}, En fonction de la proportion de population (Pop 1 de k={k1}, Pop 2 de k={k2})")
+    plt.errorbar(p, N, yerr=ecart, fmt = 'none', capsize = 10, ecolor = 'red', zorder = 1)
+    plt.show()
+    return Ntours

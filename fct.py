@@ -71,7 +71,7 @@ def SFF(T):
 
 #Fonction permettant de calculer w :
 def w(x,y,k,TM,TS,t):
-    d=((TM[x,y]!=3 and TM[x,y]!=1) or t==1)
+    d=((TM[x,y]!=3 and TM[x,y]!=1 and TM[x,y]!=4) or t==1)
     return np.exp(-k*TS[x,y])*d
 
 #Fonction permettant de calculer le poids selon W et Z(somme des W):
