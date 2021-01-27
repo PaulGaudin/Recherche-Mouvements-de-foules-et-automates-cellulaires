@@ -97,9 +97,10 @@ def friction(TM,k1,k2,u):
     Ind=Ind.astype(np.int64)
     B=C[Ind[0]]
     M=Mt[:,0:3]
+    M1=M[:,0:2]
     M=M.astype(np.int64)
     B=B.astype(np.int64)
-    unique,indices,count=np.unique(M,return_inverse=True,return_counts=True,axis=0)
+    unique,indices,count=np.unique(M1,return_inverse=True,return_counts=True,axis=0)
     if(not (count==np.ones(count.size)).all()):
         I=np.where(count>1)[0]
         for i in I:
@@ -215,43 +216,6 @@ def SimulationsPpop(d,taille,u,k1,k2,Npas,Nsim):
 
     for i in range(Npas):
         print('a')
-        N[i]=Ntours[i].sum()/Ntours[i].size
-        ecart[i]=ecartType(Ntours[i])
-
-    print('b')
-    fig = plt.figure(figsize=(15,10))
-    plt.plot(p,N)
-    plt.xlabel("Proportion de population (0 équivaut a que une population 1 et 1 équivaut a que une population 2)")
-    plt.ylabel("Nombre de tours")
-    plt.title(f"Nombre de tour mis pour purger une piece de taille {taille} et densité {d}, En fonction de la proportion de population (Pop 1 de k={k1}, Pop 2 de k={k2})")
-    plt.errorbar(p, N, yerr=ecart, fmt = 'none', capsize = 10, ecolor = 'red', zorder = 1)
-    plt.show()
-    return Ntours
-
-
-@timer
-def resolv2(TM,Ppop,k1,k2,u):
-    Nb=0
-    X=np.sum(TM==1)
-    NStop=0
-    Na=0
-    while((TM==Init(TM.shape[0]-2,TM.shape[1]-2)).all()!=1 and NStop<(X*3)):
-        TM,n=Deplacement(TM,k1,k2,Ppop,u)
-        NStop+=n
-        if(NStop==(X*2)):
-            Na=Nb
-        Nb+=1
-    return Nb-Na
-
-@timer
-def SimulationsPpop2(d,taille,u,k1,k2,Npas,Nsim):
-    p=np.linspace(0,1,Npas)
-    Terrains=np.asarray([creerSalle(d,pt,taille[0],taille[1]) for pt in p])
-    Ntours=np.asarray([[resolv2(creerSalle(d,pt,taille[0],taille[1]),pt,k1,k2,u) for pt in p] for i in range(Nsim)])
-    N=np.zeros(Npas)
-    ecart=np.zeros(Npas)
-
-    for i in range(Npas):
         N[i]=Ntours[i].sum()/Ntours[i].size
         ecart[i]=ecartType(Ntours[i])
 
