@@ -71,7 +71,7 @@ def SFF(T):
 
 #Fonction permettant de calculer w :
 def w(x,y,k,TM,TS,t):
-    d=((TM[x,y]!=3 and TM[x,y]!=1 and TM[x,y]!=4) or t==1)
+    d=((TM[x,y]!=3 and TM[x,y]!=1) or t==1)
     return np.exp(-k*TS[x,y])*d
 
 #Fonction permettant de calculer le poids selon W et Z(somme des W):
@@ -81,7 +81,7 @@ def p(Z,W):
 
 #Fonction alternative calculant directement le poids d'une direction a partir des coordonnées de base et de la direction:
 def p2(x,y,k,TM,TS,u,v):
-    H=[[0,0],[-1,0],[1,0],[0,-1],[0,1]]
+    H=[[0,0],[-1,0],[1,0],[0,-1],[0,1],[1,1],[-1,1],[-1,-1],[1,-1]]
     wt=[]
     #wt=[w(x+H[i][0],y+H[i][1],k,TM,t) for i in range(len(H))]
     for i in range(len(H)):
@@ -97,7 +97,7 @@ def p2(x,y,k,TM,TS,u,v):
 
 #Fonction permettant d'obtenir le mouvement d'un automate :
 def Mouvement(x,y,k,TM,TS):
-    H=[[0,0],[-1,0],[1,0],[0,-1],[0,1]]
+    H=[[0,0],[-1,0],[1,0],[0,-1],[0,1],[1,1],[-1,1],[-1,-1],[1,-1]]
     wt=[]
     pt=[]
     for i in range(len(H)): #a optimiser
@@ -112,7 +112,7 @@ def Mouvement(x,y,k,TM,TS):
         
     A=uniform(0,sum(pt))
     B=0
-    for i in range(5):
+    for i in range(len(H)):
         B+=pt[i]
         if (A<=B):
             return [x+H[i][0],y+H[i][1]]
@@ -126,6 +126,7 @@ def update(TM,TS,k):
 
 #Fonction permettant si il y a conflit de les résoudre en utilisant la méthode de friction :
 def friction(TM,k,u):
+    compte=0
     TS=SFF(TM)
     M,B = update(TM,TS,k)
     M=M.astype(np.int64)
@@ -136,6 +137,7 @@ def friction(TM,k,u):
         for i in I:
             J=np.where(indices==i)[0]
             for j in range(J.size-1):
+                compte+=1
                 if(np.random.binomial(1,u,size=None)==1):
                     M[J[j]]=B[J[j]].copy()
                     M[J[j+1]]=B[J[j+1]].copy()
@@ -143,7 +145,7 @@ def friction(TM,k,u):
                     M[J[j+1]]=B[J[j+1]].copy()
                 else:
                     M[J[j]]=B[J[j]].copy()               
-    return M
+    return M,compte
 
 #Un timer
 def timer(function):

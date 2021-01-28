@@ -30,7 +30,7 @@ def creerSalle(densite,ProportionPop,Ly,Lx):
 
 #Fonction alternative calculant directement le poids d'une direction a partir des coordonnées de base et de la direction:
 def p2(x,y,k1,k2,TM,TS,u,v):
-    H=[[0,0],[-1,0],[1,0],[0,-1],[0,1]]
+    H=[[0,0],[-1,0],[1,0],[0,-1],[0,1],[1,1],[-1,1],[-1,-1],[1,-1]]
     wt=[]
     k=0
     if(TM[x,y]==1):
@@ -51,7 +51,7 @@ def p2(x,y,k1,k2,TM,TS,u,v):
 
 #Fonction permettant d'obtenir le mouvement d'un automate :
 def Mouvement(x,y,k1,k2,TM,TS):
-    H=[[0,0],[-1,0],[1,0],[0,-1],[0,1]]
+    H=[[0,0],[-1,0],[1,0],[0,-1],[0,1],[1,1],[-1,1],[-1,-1],[1,-1]]
     wt=[]
     pt=[]
     k=0
@@ -72,7 +72,7 @@ def Mouvement(x,y,k1,k2,TM,TS):
         
     A=uniform(0,sum(pt))
     B=0
-    for i in range(5):
+    for i in range(len(H)):
         B+=pt[i]
         if (A<=B):
             return [x+H[i][0],y+H[i][1],TM[x,y]]
@@ -131,26 +131,26 @@ def Deplacement(TM,k1,k2,Ppop,u):
         k=0
         #On veut maintenant reinjecter le nombre de personnes sortantes dans Temp vers le fond
         #On creer un espace de coordonées où reinjecter les personnes = 2 bandes au fond de la salle
-        x_reinjection_min=(len(TM)-1)-3
-        x_reinjection_max=(len(TM)-1)-1
+        #x_reinjection_min=(len(TM)-1)-3
+        #x_reinjection_max=(len(TM)-1)-1
 
-        y_reinjection_min=1
-        y_reinjection_max=len(TM-1)-2
+        #y_reinjection_min=1
+        #y_reinjection_max=len(TM-1)-2
 
-        while((np.sum(TM==0))!=(np.sum(Temp==0))): 
+        #while((np.sum(TM==0))!=(np.sum(Temp==0))): 
 
 
             #Pour chaque personne a reinjectée, on choisit des coordonées au hasard dans la rectangle de respawn
-            new_x=new_y=0
-            new_x=randint(x_reinjection_min, x_reinjection_max)
-            new_y=randint(y_reinjection_min, y_reinjection_max)
+            #new_x=new_y=0
+            #new_x=randint(x_reinjection_min, x_reinjection_max)
+            #new_y=randint(y_reinjection_min, y_reinjection_max)
 
-            while(Temp[new_x,new_y]!=0):
-                new_x=randint(x_reinjection_min, x_reinjection_max)
-                new_y=randint(y_reinjection_min, y_reinjection_max)
+            #while(Temp[new_x,new_y]!=0):
+                #new_x=randint(x_reinjection_min, x_reinjection_max)
+                #new_y=randint(y_reinjection_min, y_reinjection_max)
             
-            Temp[new_x,new_y]=1+np.random.binomial(1, Ppop, size=None)*3
-            k+=1
+            #Temp[new_x,new_y]=1+np.random.binomial(1, Ppop, size=None)*3
+            #k+=1
     
     return Temp,k
 
@@ -210,16 +210,45 @@ def SimulationsPpop(d,taille,u,k1,k2,Npas,Nsim):
     p=np.linspace(0,1,Npas)
     #Terrains=np.asarray([creerSalle(d,pt,taille[0],taille[1]) for pt in p])
     Ntours=np.asarray([[resolv(d,taille,pt,k1,k2,u) for i in range(Nsim)] for pt in p])
-    print('c')
     N=np.zeros(Npas)
     ecart=np.zeros(Npas)
 
     for i in range(Npas):
-        print('a')
         N[i]=Ntours[i].sum()/Ntours[i].size
         ecart[i]=ecartType(Ntours[i])
 
-    print('b')
+    fig = plt.figure(figsize=(15,10))
+    plt.plot(p,N)
+    plt.xlabel("Proportion de population (0 équivaut a que une population 1 et 1 équivaut a que une population 2)")
+    plt.ylabel("Nombre de tours")
+    plt.title(f"Nombre de tour mis pour purger une piece de taille {taille} et densité {d}, En fonction de la proportion de population (Pop 1 de k={k1}, Pop 2 de k={k2})")
+    plt.errorbar(p, N, yerr=ecart, fmt = 'none', capsize = 10, ecolor = 'red', zorder = 1)
+    plt.show()
+    return Ntours
+
+
+@timer
+def resolvSR(d,taille,Ppop,k1,k2,u):
+    TM=creerSalle(d,Ppop,taille[0],taille[1])
+    Nb=0
+    Ref=Init(TM.shape[0]-2,TM.shape[1]-2)
+
+    while((TM==Ref).all()!=1):
+        TM,n=Deplacement(TM,k1,k2,Ppop,u)
+        Nb+=1
+    return Nb
+
+def SimulationsPpopSR(d,taille,u,k1,k2,Npas,Nsim):
+    p=np.linspace(0,1,Npas)
+    #Terrains=np.asarray([creerSalle(d,pt,taille[0],taille[1]) for pt in p])
+    Ntours=np.asarray([[resolvSR(d,taille,pt,k1,k2,u) for i in range(Nsim)] for pt in p])
+    N=np.zeros(Npas)
+    ecart=np.zeros(Npas)
+
+    for i in range(Npas):
+        N[i]=Ntours[i].sum()/Ntours[i].size
+        ecart[i]=ecartType(Ntours[i])
+
     fig = plt.figure(figsize=(15,10))
     plt.plot(p,N)
     plt.xlabel("Proportion de population (0 équivaut a que une population 1 et 1 équivaut a que une population 2)")

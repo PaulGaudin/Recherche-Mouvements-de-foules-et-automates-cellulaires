@@ -7,7 +7,7 @@ from matplotlib import animation, rc
 
 #Fonction effectuant un déplacement complet de tout les automates en parallèle (méthode de friction): 
 def Deplacement(TM,k,u):
-    New=friction(TM,k,u)
+    New,n=friction(TM,k,u)
     Temp=Init(TM.shape[0]-2,TM.shape[1]-2)
     if(np.shape(New)[0]==0):
         return Temp

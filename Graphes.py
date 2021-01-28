@@ -1,4 +1,6 @@
-from Reinject import resolv,creerSalle,timer
+#from Reinject import resolv,creerSalle
+from fct import *
+from base import *
 import matplotlib.colors
 import numpy as np
 import matplotlib.pyplot as plt
