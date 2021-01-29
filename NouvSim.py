@@ -3,6 +3,8 @@ from base import *
 import numpy as np
 from random import randint
 
+
+#Créé une salle contenant un nombre déterminé de personnes a l'intérieur
 def creerSalle(nb, Ly, Lx): #Attention, nb doit etre inferieur à (Lx)*(Ly)
     ligneMur = [3]*(Ly+2)
     colonneMur = [3]*Lx
@@ -59,7 +61,7 @@ def faisTourner(nbP, taille, k, u, nbSim ):
 
     max=np.max(temps)
     min=np.min(temps)
-    #On creer un nombre qui est l'intier directeent superieur à max_temps
+    #On créé un nombre qui est l'intier directement superieur à max_temps
     sup=int(max)+1
     inf=int(min)
     nbValeurs, moy, mediane, quartils, var, ecart = etudeStat(temps)
@@ -77,7 +79,7 @@ def faisTourner(nbP, taille, k, u, nbSim ):
 
     return temps
 
-
+#Fonction renvoyant l'étude statistique complète d'un ensemble de tableaux 
 def etudeStat(tableau):
 
     #On défini la moyenne du tableau:
@@ -103,6 +105,7 @@ def etudeStat(tableau):
 
     return len(tableau), moy, mediane, quartils, var, ecart #retourne, le nb de valeurs, la moyenne, la variance, l'écart type
 
+#Fonction permettant de calculer l'écart type d'un ensemble de donnés
 def ecartType(tableau):
     #On défini la moyenne du tableau:
     moy=0
@@ -118,6 +121,7 @@ def ecartType(tableau):
 
     #Puis on retourn l'écart type qui est la racine carrée de la variance
     return np.sqrt(varTableau)
+
 
 @timer
 def SimulationsK(Nb,taille,u,kmin,kmax,Npas,Nsim):
