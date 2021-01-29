@@ -7,7 +7,7 @@ from matplotlib import animation, rc
 
 #Fonction effectuant un déplacement complet de tout les automates en parallèle (méthode de friction): 
 def Deplacement(TM,k,u):
-    New,compte=friction(TM,k,u)
+    New=friction(TM,k,u)
     Temp=Init(TM.shape[0]-2,TM.shape[1]-2)
     if(np.shape(New)[0]==0):
         return Temp
@@ -15,7 +15,7 @@ def Deplacement(TM,k,u):
         x,y=New.transpose()
         Temp[x,y]=1
         Temp[0,int(TM.shape[1]/2)]=Temp[0,int((TM.shape[1]/2)-1)]=2
-        return Temp,compte
+        return Temp
 
 
 #Effectue une résolution complète et renvoie le nombre de tour necessaires
@@ -35,7 +35,7 @@ def resolution(TM,k,u):
     evol=[TM]
     Nb=0
     while((TM==Init(TM.shape[0]-2,TM.shape[1]-2)).all()!=1):
-        TM,A=Deplacement(TM,k,u)
+        TM=Deplacement(TM,k,u)
         evol.append(TM)
         Nb+=1
 
