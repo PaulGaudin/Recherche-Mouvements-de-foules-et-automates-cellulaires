@@ -5,7 +5,10 @@ import timeit
 from random import uniform,randint
 from matplotlib import animation, rc
 
-#Affiche la salle (matrice carré) S
+"""Affiche la salle (matrice carré) S
+@params:
+- S la pièce que l'on veut afficher
+"""
 def plotSalle(S):
     cmap = matplotlib.colors.ListedColormap(['white','black',"red", "gray", "yellow"])
     boundaries = [-0.2, 0.5, 1.5, 2.5, 3.5, 4.5]
@@ -14,7 +17,15 @@ def plotSalle(S):
     plt.pcolor(S,cmap=cmap,norm=norm)
     plt.show()
 
-#Creation d'une pièce remplie d'automate
+"""Creation d'une pièce remplie d'automate
+@params:
+- densité la densité de population voulue
+- Ly la taille verticale de la pièce
+- Lx la taille horizontale de la pièce
+
+@return:
+- La salle de dimensions Lx*Ly, contenant une densité d de population a l'intérieur
+"""
 def creerSalle(densite,Ly,Lx):
     ligneMur = [3]*(Lx+2)
     colonneMur = [3]*Ly
@@ -31,7 +42,10 @@ def creerSalle(densite,Ly,Lx):
     return salle
 
 
-#Afficher le SFF de la salle
+"""Afficher le SFF de la salle
+@params:
+- salle la salle dont on veut calculer le SFF
+"""
 def afficheSFF(salle):
     Ly=len(salle)
     Lx=len(salle[0])    
@@ -45,7 +59,14 @@ def afficheSFF(salle):
     plt.show()
 
 
-#Initialisation d'une pièce vide
+"""Initialisation d'une pièce vide
+@params:
+- Ly la taille verticale de la pièce
+- Lx la taille horizontale de la pièce
+
+@return:
+- Une pièce de dimensions Lx*Ly
+"""
 def Init(Ly,Lx):
     piece=np.zeros(shape=(Ly,Lx))
     ligneMur = [3]*(Lx+2)
@@ -57,7 +78,13 @@ def Init(Ly,Lx):
     return piece
 
 
-#Définition du SFF d'une pièce donnée :
+"""Définition du SFF d'une pièce donnée :
+@params:
+- T la salle dont on veut calculer le SFF
+
+@return:
+- Le SFF
+"""
 def SFF(T):
     dx=0.4
     R=np.copy(T)
@@ -69,17 +96,44 @@ def SFF(T):
     return R
 
 
-#Fonction permettant de calculer w le poids associé a un mouvement
+"""Fonction permettant de calculer w le poids associé a un mouvement
+@params:
+- x la coordonnée en x de l'agent
+- y la coordonnée en y de l'agent
+- k le kappa voulu
+- TM la salle considérée
+- TS le SFF de la salle considérée
+- t un paramètre indiquant si on calcule le poids d'aucun déplacement (du déplacement [0,0]) ou pas
+
+@return:
+- le poids du déplacement
+"""
 def w(x,y,k,TM,TS,t):
     d=((TM[x,y]!=3 and TM[x,y]!=1) or t==1)
     return np.exp(-k*TS[x,y])*d
 
-#Fonction permettant de calculer la normalisation de w (afin d'en faire une probabilité d'événement)
+"""Fonction permettant de calculer la normalisation de w (afin d'en faire une probabilité d'événement)
+@params:
+- Z la somme de tout les poids
+- W le poids que l'on veut normaliser
+
+@return:
+- le poids normalisé
+"""
 def p(Z,W):
     return (1/Z)*W
 
 
-#Fonction alternative calculant directement le poids d'une direction a partir des coordonnées de base et de la direction:
+"""Fonction alternative calculant directement le poids d'une direction a partir des coordonnées de base et de la direction:
+@params:
+- x la coordonnée en x de l'agent
+- y la coordonnée en y de l'agent
+- k le kappa voulu
+- TM la salle considérée
+- TS le SFF de la salle considérée
+- u la coordonnée  en x de déplacement de l'agent
+- u la coordonnée  en y de déplacement de l'agent
+"""
 def p2(x,y,k,TM,TS,u,v):
     H=[[0,0],[-1,0],[1,0],[0,-1],[0,1],[1,1],[-1,1],[-1,-1],[1,-1]]
     wt=[]
@@ -94,7 +148,14 @@ def p2(x,y,k,TM,TS,u,v):
     
     return p(Z,w(u,v,k,TM,TS,t))
 
-#Fonction permettant d'obtenir le mouvement d'un automate :
+"""#Fonction permettant d'obtenir le mouvement d'un automate :
+@params:
+- x la coordonnée en x de l'agent
+- y la coordonnée en y de l'agent
+- k le kappa voulu
+- TM la salle considérée
+- TS le SFF de la salle considérée
+"""
 def Mouvement(x,y,k,TM,TS):
     H=[[0,0],[-1,0],[1,0],[0,-1],[0,1],[1,1],[-1,1],[-1,-1],[1,-1]]
     wt=[]
@@ -116,14 +177,31 @@ def Mouvement(x,y,k,TM,TS):
         if (A<=B):
             return [x+H[i][0],y+H[i][1]]
 
-#Fonction permettant de récuperer tout les mouvements des automates :
+"""#Fonction permettant de récuperer tout les mouvements des automates :
+@params:
+- x la coordonnée en x de l'agent
+- y la coordonnée en y de l'agent
+- k le kappa voulu
+- TM la salle considérée
+- TS le SFF de la salle considérée
+- u la coordonnée  en x de déplacement de l'agent
+- u la coordonnée  en y de déplacement de l'agent
+"""
 def update(TM,TS,k):
     x,y = np.where(TM==1)
     base=np.vstack([x,y]).T
     Mouv=np.array([Mouvement(x[i],y[i],k,TM,TS) for i in range(x.size)])
     return Mouv,base
 
-#Fonction permettant si il y a conflit de les résoudre en utilisant la méthode de friction :
+"""#Fonction permettant si il y a conflit de les résoudre en utilisant la méthode de friction :
+@params:
+- TM la pièce considérée
+-  k le kappa voulu
+- u le mu voulu
+
+@return:
+- Nb le nombre de tour mis pour purger la salle
+"""
 def friction(TM,k,u):
     TS=SFF(TM)
     M,B = update(TM,TS,k)

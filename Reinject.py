@@ -1,4 +1,5 @@
 from fct import friction,Init,timer,creerSalle
+from Graphes import ecartType
 import matplotlib.colors
 import numpy as np
 import matplotlib.pyplot as plt
@@ -6,7 +7,16 @@ import timeit
 from matplotlib import animation, rc
 from random import randint
 
-#Fonction effectuant un déplacement complet de tout les automates en parallèle (méthode de friction), en ajoutant la réinjection des automates passant la porte 
+"""Fonction effectuant un déplacement complet de tout les automates en parallèle (méthode de friction), en ajoutant la réinjection des automates passant la porte 
+@params:
+- TM le tableau dont on veut effectuer le déplacement
+- k le kappa a utiliser
+- u le mu a utiliser
+
+@return:
+- Temp le nouveau tableau correspondant au tour k+1 a partir de TM, le tableau correspondant au tour k
+- k le nombre de personnes ayant été réinjectés
+"""
 def Deplacement(TM,k,u):
     New,n=friction(TM,k,u)
     Temp=Init(TM.shape[0]-2,TM.shape[1]-2)
@@ -45,8 +55,18 @@ def Deplacement(TM,k,u):
     
     return Temp,k
 
+"""Affiche une purge complète d'une salle de densité et taille donnée, selon un kappa et mu donné (avec réinjection)
+@params:
+- d la densité de population dans la pièce
+- taille la taille de la pièce (taille est un tableau de type (Lx,Ly))
+- k le kappa a utiliser
+- u le mu a utiliser
 
-def resolution(TM,k,u):
+@return:
+- Nb le nombre de tour mis pour purger la salle
+"""
+def resolution(d,taille,k,u):
+    TM=creerSalle(d,taille[0],taille[1])
     evol=[TM]
     Nb=0
     X=np.sum(TM==1)*2
@@ -81,6 +101,16 @@ def resolution(TM,k,u):
     plt.clf()
     return Nb
         
+
+"""Effectue une résolution complète et renvoie le nombre de tour necessaire a celle-ci (avec réinjection)
+@params:
+- TM le tableau dont on veut effectuer la résolution
+- k le kappa a utiliser
+- u le mu a utiliser
+
+@return:
+- Nb le nombre de tour mis pour purger la salle
+"""
 @timer
 def resolv(TM,k,u):
     Nb=0
@@ -95,6 +125,14 @@ def resolv(TM,k,u):
         Nb+=1
     return Nb-Na
 
+"""Affiche une simulation de Npas de mu (mu allant de 0 a 1) en fonction de k et d'une pièce de densité et taille donné, Nsim simulations par pas (avec réinjection)
+@params:
+- d la densité de population dans la pièce
+- taille la taille de la pièce (taille est un tableau de type (Lx,Ly))
+- k le kappa a utiliser
+- le nombre de pas
+- le nombre de simulations par pas
+"""
 @timer    
 def SimulationsU(d,taille,k,Npas,Nsim):
     Terrains=np.asarray([creerSalle(d,taille[0],taille[1]) for i in range(Nsim)])
@@ -116,23 +154,19 @@ def SimulationsU(d,taille,k,Npas,Nsim):
     plt.show()
 
 
-def ecartType(tableau):
-    #On défini la moyenne du tableau:
-    moy=0
-    for i in range(len(tableau)):
-        moy=moy+tableau[i]
-    moy=moy/len(tableau)
-    #On definit la variance
-    varTableau=0
-    for i in range(len(tableau)):
-        varTableau=varTableau + (tableau[i]-moy)**2
+"""Affiche une simulation de Npas de mu (mu allant de 0 a 1) en fonction de k et d'une pièce de densité et taille donné, Nsim simulations par pas (avec réinjection)
+@params:
+- d la densité de population dans la pièce
+- taille la taille de la pièce (taille est un tableau de type (Lx,Ly))
+- u le mu a utiliser
+- kmin le kappa minimum a considérer
+- kmax le kappa maximuma considérer
+- Npas le nombre de pas
+- Nsim le nombre de simulations par pas
 
-    varTableau=varTableau/len(tableau)
-
-    #Puis on retourn l'écart type qui est la racine carrée de la variance
-    return np.sqrt(varTableau)
-
-
+@return:
+- Le nombre de tour mis par chacune des simulations pour purger la pièce
+"""
 @timer
 def SimulationsK(d,taille,u,kmin,kmax,Npas,Nsim):
     Terrains=np.asarray([creerSalle(d,taille[0],taille[1]) for i in range(Nsim)])

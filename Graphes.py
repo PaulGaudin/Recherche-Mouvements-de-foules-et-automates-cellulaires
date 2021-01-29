@@ -10,7 +10,14 @@ from random import randint
 
     
 
-#Affiche une simulation de Npas de mu (mu allant de 0 a 1) en fonction de k et d'une pièce de densité et taille donné, Nsim simulations par pas
+"""Affiche une simulation de Npas de mu (mu allant de 0 a 1) en fonction de k et d'une pièce de densité et taille donné, Nsim simulations par pas
+@params:
+- d la densité de population dans la pièce
+- taille la taille de la pièce (taille est un tableau de type (Lx,Ly))
+- k le kappa a utiliser
+- le nombre de pas
+- le nombre de simulations par pas
+"""
 @timer    
 def SimulationsU(d,taille,k,Npas,Nsim):
     Terrains=np.asarray([creerSalle(d,taille[0],taille[1]) for i in range(Nsim)])
@@ -32,7 +39,13 @@ def SimulationsU(d,taille,k,Npas,Nsim):
     plt.show()
 
 
-#Fonction permettant de calculer l'écart type
+"""Fonction permettant de calculer l'écart type
+@params:
+- tableau un tableau de valeurs dont on veut calculer l'écart type
+
+@return:
+- l'écart type des données contenues dans tableau
+"""
 def ecartType(tableau):
     #On défini la moyenne du tableau:
     moy=0
@@ -50,7 +63,19 @@ def ecartType(tableau):
     return np.sqrt(varTableau)
 
 
-#Affiche une simulation de Npas de k entre kmin et kmax en fonction de mu et d'une pièce de densité et taille donné, Nsim simulations par pas
+"""Affiche une simulation de Npas de mu (mu allant de 0 a 1) en fonction de k et d'une pièce de densité et taille donné, Nsim simulations par pas
+@params:
+- d la densité de population dans la pièce
+- taille la taille de la pièce (taille est un tableau de type (Lx,Ly))
+- u le mu a utiliser
+- kmin le kappa minimum a considérer
+- kmax le kappa maximuma considérer
+- Npas le nombre de pas
+- Nsim le nombre de simulations par pas
+
+@return:
+- le tableau contenant toute les valeurs de nombre de tours mises par chacune des simulations a faire sortir tout les agents
+"""
 @timer
 def SimulationsK(d,taille,u,kmin,kmax,Npas,Nsim):
     Terrains=np.asarray([creerSalle(d,taille[0],taille[1]) for i in range(Nsim)])
@@ -73,7 +98,14 @@ def SimulationsK(d,taille,u,kmin,kmax,Npas,Nsim):
     return Ntours
 
 
-#Pareil que SimulationsU mais donne les résultats en mètre et en seconde au lieu de cellule et étapes
+"""#Pareil que SimulationsU mais donne les résultats en mètres et en secondes au lieu de cellules et étapes
+@params:
+- d la densité de population dans la pièce
+- taille la taille de la pièce (taille est un tableau de type (Lx,Ly))
+- k le kappa a utiliser
+- le nombre de pas
+- le nombre de simulations par pas
+"""
 @timer    
 def SimulationsUR(d,taille,k,Npas,Nsim):
     Terrains=np.asarray([creerSalle(d,taille[0],taille[1]) for i in range(Nsim)])
@@ -95,7 +127,16 @@ def SimulationsUR(d,taille,k,Npas,Nsim):
     plt.show()
 
 
-#Pareil que SimulationsK mais donne les résultats en mètre et en seconde au lieu de cellule et étapes
+"""Pareil que SimulationsK mais donne les résultats en mètres et en secondes au lieu de cellules et étapes
+@params:
+- d la densité de population dans la pièce
+- taille la taille de la pièce (taille est un tableau de type (Lx,Ly))
+- u le mu a utiliser
+- kmin le kappa minimum a considérer
+- kmax le kappa maximuma considérer
+- Npasle nombre de pas
+- Nsim le nombre de simulations par pas
+"""
 @timer
 def SimulationsKR(d,taille,u,kmin,kmax,Npas,Nsim):
     Terrains=np.asarray([creerSalle(d,taille[0],taille[1]) for i in range(Nsim)])

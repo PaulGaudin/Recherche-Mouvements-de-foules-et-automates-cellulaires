@@ -1,10 +1,19 @@
 from fct import plotSalle,afficheSFF,Init,SFF,w,p,p2,Mouvement,update,friction,timer
+from Graphes import ecartType
 from base import *
 import numpy as np
 from random import randint
 
 
-#Créé une salle contenant un nombre déterminé de personnes a l'intérieur
+"""Créé une salle contenant un nombre déterminé de personnes a l'intérieur
+@params:
+- nb le nombre de personne a placer dans la salle
+- Ly les dimensions verticales de la salle
+- Lx les dimensions horizontales de la salle
+
+@return:
+- Une salle de dimension Lx*Ly contenant nb personnes placés aléatoirement
+"""
 def creerSalle(nb, Ly, Lx): #Attention, nb doit etre inferieur à (Lx)*(Ly)
     ligneMur = [3]*(Ly+2)
     colonneMur = [3]*Lx
@@ -38,7 +47,15 @@ def creerSalle(nb, Ly, Lx): #Attention, nb doit etre inferieur à (Lx)*(Ly)
     return salle
 
 
-    #Affiche chaque tour jusqu'a ce que tout les automates soient sortis
+"""Affiche chaque tour jusqu'a ce que tout les automates soient sortis
+@params:
+- TM la salle
+- k le kappa voulu
+- u le mu voulu
+
+@return:
+- Nb le nombre de tour mis pour purger la salle
+"""
 def resolutionSansVideo(TM,k,u):
     evol=[TM]
     Nb=0
@@ -48,7 +65,17 @@ def resolutionSansVideo(TM,k,u):
         Nb+=1
     return Nb
 
-#fct qui fait tourner un certain nbr de fois resolution 1 pour une piece creée avec creerSalle mais qui ne l'affiche pas
+"""fct qui fait tourner un certain nbr de fois resolution 1 pour une piece creée avec creerSalle mais qui ne l'affiche pas
+@params:
+- nbP le nombre de personne a placer dans la salle
+- taille la taille de la pièce (taille est un tableau de type (Lx,Ly))
+- k le kappa voulu
+- u le mu voulu
+- nbSim le nombre de simulations a effectuer
+
+@return:
+- Le temps mis par chacune des simulations pour purger la salle
+"""
 def faisTourner(nbP, taille, k, u, nbSim ):
     temps=[]  
     for i in range(nbSim):
@@ -79,7 +106,18 @@ def faisTourner(nbP, taille, k, u, nbSim ):
 
     return temps
 
-#Fonction renvoyant l'étude statistique complète d'un ensemble de tableaux 
+"""Fonction renvoyant l'étude statistique complète d'un ensemble de tableaux 
+@params:
+- tableau un tableau de données
+
+@return:
+- Len(tableau) le nombre de valeurs
+- moy la moyenne des valeurs
+- mediane la médiane des valeurs
+- quartils les quartiles
+- var la variance des valeurs
+- ecart l'écart type des valeurs contenues dans le tableau
+"""
 def etudeStat(tableau):
 
     #On défini la moyenne du tableau:
@@ -105,39 +143,28 @@ def etudeStat(tableau):
 
     return len(tableau), moy, mediane, quartils, var, ecart #retourne, le nb de valeurs, la moyenne, la variance, l'écart type
 
-#Fonction permettant de calculer l'écart type d'un ensemble de donnés
-def ecartType(tableau):
-    #On défini la moyenne du tableau:
-    moy=0
-    for i in range(len(tableau)):
-        moy=moy+tableau[i]
-    moy=moy/len(tableau)
-    #On definit la variance
-    varTableau=0
-    for i in range(len(tableau)):
-        varTableau=varTableau + (tableau[i]-moy)**2
 
-    varTableau=varTableau/len(tableau)
 
-    #Puis on retourn l'écart type qui est la racine carrée de la variance
-    return np.sqrt(varTableau)
-
-#Affiche une simulation de Npas de k entre kmin et kmax en fonction de mu et d'une pièce de densité et taille donné, Nsim simulations par pas
+"""#Affiche une simulation de Npas de k entre kmin et kmax en fonction de mu et d'une pièce de densité et taille donné, Nsim simulations par pas
+@params:
+- Nb le nombre de personne a placer dans la salle
+- taille la taille de la pièce (taille est un tableau de type (Lx,Ly))
+- u le mu voulu
+- kmin le kappa minimum a considérer
+- kmax le kappa maximum a considérer
+- Npas le nombre des pas de kappa
+- Nsim le nombre de simulations par pas
+"""
 @timer
 def SimulationsK(Nb,taille,u,kmin,kmax,Npas,Nsim):
     Terrains=np.asarray([creerSalle(Nb,taille[0],taille[1]) for i in range(Nsim)])
     k=np.linspace(kmin,kmax,Npas)
-    Result=np.asarray([[resolv(Terrain,kt,u) for Terrain in Terrains] for kt in k])
+    Ntours=np.asarray([[resolv(Terrain,kt,u) for Terrain in Terrains] for kt in k])
     N=np.zeros(Npas)
-    compte=np.zeros(Npas)
     ecart=np.zeros(Npas)
 
     for i in range(Npas):
-        Ntours,A=Result.T
-        Ntours=Ntours.T
-        A=A.T
         N[i]=Ntours[i].sum()/Ntours[i].size
-        compte[i]=A[i].sum()/A[i].size
         ecart[i]=ecartType(Ntours[i])
 
     fig = plt.figure(figsize=(15,10))
@@ -148,12 +175,20 @@ def SimulationsK(Nb,taille,u,kmin,kmax,Npas,Nsim):
     plt.errorbar(k, N, yerr=ecart, fmt = 'none', capsize = 10, ecolor = 'red', zorder = 1)
     plt.show()
     plt.figure(figsize=(15,10))
-    return compte
 
-#Affiche une simulation de Npas de mu (mu allant de 0 a 1) en fonction de k et d'une pièce de densité et taille donné, Nsim simulations par pas
+
+"""Affiche une simulation de Npas de mu (mu allant de 0 a 1) en fonction de k et d'une pièce de densité et taille donné, Nsim simulations par pas
+@params:
+- Nb le nombre de personne a placer dans la salle
+- taille la taille de la pièce (taille est un tableau de type (Lx,Ly))
+- k le kappa voulu
+- u le mu voulu
+- Npas le nombre des pas de mu
+- Nsim le nombre de simulations par pas
+"""
 @timer    
-def SimulationsU(d,taille,k,Npas,Nsim):
-    Terrains=np.asarray([creerSalle(d,taille[0],taille[1]) for i in range(Nsim)])
+def SimulationsU(Nb,taille,k,Npas,Nsim):
+    Terrains=np.asarray([creerSalle(Nb,taille[0],taille[1]) for i in range(Nsim)])
     u=np.linspace(0,1,Npas)
     Ntours=np.asarray([[resolv(Terrain,k,ut) for Terrain in Terrains] for ut in u])
     N=np.zeros(Npas)

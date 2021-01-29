@@ -8,8 +8,8 @@ from matplotlib import animation, rc
 from random import randint
 from Graphes import ecartType
 
-#Note : toute les fonctions suivantes on un fonctionnement analogues au fonctions présentes dans les fichiers base et fct, mais sont codé de facon a accueillir 2 populations 
-#(donc prennent deux k différent en paramètre et la proportion des 2 populations)
+"""Note : toute les fonctions suivantes on un fonctionnement analogues au fonctions présentes dans les fichiers base et fct, mais sont codé de facon a accueillir 2 populations 
+(donc prennent deux k différent en paramètre et la proportion des 2 populations)"""
 
 def creerSalle(densite,ProportionPop,Ly,Lx):
     ligneMur = [3]*(Ly+2)
@@ -158,6 +158,16 @@ def Deplacement(TM,k1,k2,Ppop,u):
             """
     return Temp,k
 
+"""Affiche une purge complète d'une salle de densité et taille donnée, selon un kappa et mu donné
+@params:
+- d la densité de population dans la pièce
+- taille la taille de la pièce (taille est un tableau de type (Lx,Ly))
+- Ppop la proportion de population
+- k1 le kappa de la population 1
+- k2 le kappa de la population 2
+- u le mu a utiliser
+"""
+
 def resolution(d,taille,Ppop,k1,k2,u):
     TM=creerSalle(d,Ppop,taille[0],taille[1])
     evol=[TM]
@@ -194,42 +204,16 @@ def resolution(d,taille,Ppop,k1,k2,u):
     plt.clf()
     return Nb
         
-@timer
-def resolv(d,taille,Ppop,k1,k2,u):
-    TM=creerSalle(d,Ppop,taille[0],taille[1])
-    Nb=0
-    X=np.sum(TM==1)+np.sum(TM==4)
-    NStop=0
-    Na=0
-    while((TM==Init(TM.shape[0]-2,TM.shape[1]-2)).all()!=1 and NStop<(X*3)):
-        TM,n=Deplacement(TM,k1,k2,Ppop,u)
-        NStop+=n
-        if(NStop==(X*2)):
-            Na=Nb
-        Nb+=1
-    return Nb-Na
 
-
-def SimulationsPpop(d,taille,u,k1,k2,Npas,Nsim):
-    p=np.linspace(0,1,Npas)
-    Ntours=np.asarray([[resolv(d,taille,pt,k1,k2,u) for i in range(Nsim)] for pt in p])
-    N=np.zeros(Npas)
-    ecart=np.zeros(Npas)
-
-    for i in range(Npas):
-        N[i]=Ntours[i].sum()/Ntours[i].size
-        ecart[i]=ecartType(Ntours[i])
-
-    fig = plt.figure(figsize=(15,10))
-    plt.plot(p,N)
-    plt.xlabel("Proportion de population (0 équivaut a que une population 1 et 1 équivaut a que une population 2)")
-    plt.ylabel("Nombre de tours")
-    plt.title(f"Nombre de tour mis pour purger une piece de taille {taille} et densité {d}, En fonction de la proportion de population (Pop 1 de k={k1}, Pop 2 de k={k2})")
-    plt.errorbar(p, N, yerr=ecart, fmt = 'none', capsize = 10, ecolor = 'red', zorder = 1)
-    plt.show()
-    return Ntours
-
-
+"""Purge complètement une salle sans afficher la purge (et sans réinjection)
+@params:
+- d la densité de population dans la pièce
+- taille la taille de la pièce (taille est un tableau de type (Lx,Ly))
+- Ppop la proportion de population
+- k1 le kappa de la population 1
+- k2 le kappa de la population 2
+- u le mu a utiliser
+"""
 @timer
 def resolvSR(d,taille,Ppop,k1,k2,u):
     TM=creerSalle(d,Ppop,taille[0],taille[1])
@@ -241,6 +225,21 @@ def resolvSR(d,taille,Ppop,k1,k2,u):
         Nb+=1
     return Nb
 
+
+"""Affiche une simulation de Npas de mu (mu allant de 0 a 1) en fonction de k et d'une pièce de densité et taille donné, Nsim simulations par pas (sans résolution)
+@params:
+- d la densité de population dans la pièce
+- taille la taille de la pièce (taille est un tableau de type (Lx,Ly))
+- Ppop la proportion de population
+- u le mu a utiliser
+- k1 le kappa de la population 1
+- k2 le kappa de la population 2
+- Npas le nombre de pas
+- Nsim le nombre de simulations par pas
+
+@return:
+- Le nombre de tour mis par chacune des simulations pour purger la pièce
+"""
 def SimulationsPpopSR(d,taille,u,k1,k2,Npas,Nsim):
     p=np.linspace(0,1,Npas)
     Ntours=np.asarray([[resolvSR(d,taille,pt,k1,k2,u) for i in range(Nsim)] for pt in p])
