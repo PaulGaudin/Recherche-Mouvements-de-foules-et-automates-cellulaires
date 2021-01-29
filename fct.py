@@ -5,7 +5,7 @@ import timeit
 from random import uniform,randint
 from matplotlib import animation, rc
 
-
+#Affiche la salle (matrice carré) S
 def plotSalle(S):
     cmap = matplotlib.colors.ListedColormap(['white','black',"red", "gray", "yellow"])
     boundaries = [-0.2, 0.5, 1.5, 2.5, 3.5, 4.5]
@@ -14,7 +14,7 @@ def plotSalle(S):
     plt.pcolor(S,cmap=cmap,norm=norm)
     plt.show()
 
-#Creation d'une pièce remplit d'automate
+#Creation d'une pièce remplie d'automate
 def creerSalle(densite,Ly,Lx):
     ligneMur = [3]*(Lx+2)
     colonneMur = [3]*Ly
@@ -31,7 +31,7 @@ def creerSalle(densite,Ly,Lx):
     return salle
 
 
-#Afficher SFF
+#Afficher le SFF de la salle
 def afficheSFF(salle):
     Ly=len(salle)
     Lx=len(salle[0])    
@@ -45,7 +45,7 @@ def afficheSFF(salle):
     plt.show()
 
 
-#Initialisation de la pièce :
+#Initialisation d'une pièce vide
 def Init(Ly,Lx):
     piece=np.zeros(shape=(Ly,Lx))
     ligneMur = [3]*(Lx+2)
@@ -69,12 +69,12 @@ def SFF(T):
     return R
 
 
-#Fonction permettant de calculer w :
+#Fonction permettant de calculer w le poids associé a un mouvement
 def w(x,y,k,TM,TS,t):
     d=((TM[x,y]!=3 and TM[x,y]!=1) or t==1)
     return np.exp(-k*TS[x,y])*d
 
-#Fonction permettant de calculer le poids selon W et Z(somme des W):
+#Fonction permettant de calculer la normalisation de w (afin d'en faire une probabilité d'événement)
 def p(Z,W):
     return (1/Z)*W
 
@@ -83,7 +83,6 @@ def p(Z,W):
 def p2(x,y,k,TM,TS,u,v):
     H=[[0,0],[-1,0],[1,0],[0,-1],[0,1],[1,1],[-1,1],[-1,-1],[1,-1]]
     wt=[]
-    #wt=[w(x+H[i][0],y+H[i][1],k,TM,t) for i in range(len(H))]
     for i in range(len(H)):
         if (i==0):
             t=1
@@ -100,7 +99,7 @@ def Mouvement(x,y,k,TM,TS):
     H=[[0,0],[-1,0],[1,0],[0,-1],[0,1],[1,1],[-1,1],[-1,-1],[1,-1]]
     wt=[]
     pt=[]
-    for i in range(len(H)): #a optimiser
+    for i in range(len(H)):
         if (i==0):
             t=1
         else:
@@ -126,7 +125,6 @@ def update(TM,TS,k):
 
 #Fonction permettant si il y a conflit de les résoudre en utilisant la méthode de friction :
 def friction(TM,k,u):
-    compte=0
     TS=SFF(TM)
     M,B = update(TM,TS,k)
     M=M.astype(np.int64)
@@ -137,7 +135,6 @@ def friction(TM,k,u):
         for i in I:
             J=np.where(indices==i)[0]
             for j in range(J.size-1):
-                compte+=1
                 if(np.random.binomial(1,u,size=None)==1):
                     M[J[j]]=B[J[j]].copy()
                     M[J[j+1]]=B[J[j+1]].copy()
@@ -145,7 +142,7 @@ def friction(TM,k,u):
                     M[J[j+1]]=B[J[j+1]].copy()
                 else:
                     M[J[j]]=B[J[j]].copy()               
-    return M,compte
+    return M
 
 #Un timer
 def timer(function):
@@ -154,7 +151,6 @@ def timer(function):
         result = function(*args, **kwargs)
         end = timeit.default_timer()
         time = end - start
-        # print(f"Executed in {round(time,3) if time > 0.001 else 'less than 0.001'} seconds.")
         print(f"Function {function.__name__} executed in {time} seconds.")
         return result
         

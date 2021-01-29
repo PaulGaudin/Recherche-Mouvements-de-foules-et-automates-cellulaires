@@ -1,4 +1,4 @@
-from fct import friction,Init,timer
+from fct import friction,Init,timer,creerSalle
 import matplotlib.colors
 import numpy as np
 import matplotlib.pyplot as plt
@@ -7,7 +7,7 @@ from matplotlib import animation, rc
 
 #Fonction effectuant un déplacement complet de tout les automates en parallèle (méthode de friction): 
 def Deplacement(TM,k,u):
-    New,n=friction(TM,k,u)
+    New=friction(TM,k,u)
     Temp=Init(TM.shape[0]-2,TM.shape[1]-2)
     if(np.shape(New)[0]==0):
         return Temp
@@ -18,7 +18,7 @@ def Deplacement(TM,k,u):
         return Temp
 
 
-#Effectue une résolution complète et renvoie le nombre de tour necessaires
+#Effectue une résolution complète et renvoie le nombre de tour necessaire a celle-ci
 @timer
 def resolv(TM,k,u):
     Nb=0
@@ -28,11 +28,12 @@ def resolv(TM,k,u):
     return Nb
 
 
-#Affiche chaque tour jusqu'a ce que tout les automates soient sortis
-def resolution(TM,k,u):
+#Affiche une purge complète d'une salle de densité et taille donnée, selon un kappa et mu donné
+def resolution(d,taille,k,u):
+    TM=creerSalle(d,taille[0],taille[1])
     evol=[TM]
     Nb=0
-    while((TM==Init(TM.shape[0]-2,TM.shape[1]-2)).all()!=1):
+    while((TM==Init(taille[0],taille[1])).all()!=1):
         TM=Deplacement(TM,k,u)
         evol.append(TM)
         Nb+=1
@@ -56,7 +57,6 @@ def resolution(TM,k,u):
 
     ani = animation.FuncAnimation(fig, animate, init_func=init, frames=Nb, interval=200, blit=False)
 
-    #video = HTML(ani.to_html5_video())
     plt.show()
     plt.clf()
     return Nb

@@ -8,6 +8,9 @@ from matplotlib import animation, rc
 from random import randint
 from Graphes import ecartType
 
+#Note : toute les fonctions suivantes on un fonctionnement analogues au fonctions présentes dans les fichiers base et fct, mais sont codé de facon a accueillir 2 populations 
+#(donc prennent deux k différent en paramètre et la proportion des 2 populations)
+
 def creerSalle(densite,ProportionPop,Ly,Lx):
     ligneMur = [3]*(Ly+2)
     colonneMur = [3]*Lx
@@ -129,29 +132,30 @@ def Deplacement(TM,k1,k2,Ppop,u):
         Temp[x,y]=K
         Temp[0,int(TM.shape[0]/2)]=Temp[0,int((TM.shape[1]/2)-1)]=2
         k=0
-        #On veut maintenant reinjecter le nombre de personnes sortantes dans Temp vers le fond
-        #On creer un espace de coordonées où reinjecter les personnes = 2 bandes au fond de la salle
-        #x_reinjection_min=(len(TM)-1)-3
-        #x_reinjection_max=(len(TM)-1)-1
+        """
+        On veut maintenant reinjecter le nombre de personnes sortantes dans Temp vers le fond
+        On creer un espace de coordonées où reinjecter les personnes = 2 bandes au fond de la salle
+        x_reinjection_min=(len(TM)-1)-3
+        x_reinjection_max=(len(TM)-1)-1
 
-        #y_reinjection_min=1
-        #y_reinjection_max=len(TM-1)-2
+        y_reinjection_min=1
+        y_reinjection_max=len(TM-1)-2
 
-        #while((np.sum(TM==0))!=(np.sum(Temp==0))): 
+        while((np.sum(TM==0))!=(np.sum(Temp==0))): 
 
 
-            #Pour chaque personne a reinjectée, on choisit des coordonées au hasard dans la rectangle de respawn
-            #new_x=new_y=0
-            #new_x=randint(x_reinjection_min, x_reinjection_max)
-            #new_y=randint(y_reinjection_min, y_reinjection_max)
+            Pour chaque personne a reinjectée, on choisit des coordonées au hasard dans la rectangle de respawn
+            new_x=new_y=0
+            new_x=randint(x_reinjection_min, x_reinjection_max)
+            new_y=randint(y_reinjection_min, y_reinjection_max)
 
-            #while(Temp[new_x,new_y]!=0):
-                #new_x=randint(x_reinjection_min, x_reinjection_max)
-                #new_y=randint(y_reinjection_min, y_reinjection_max)
+            while(Temp[new_x,new_y]!=0):
+                new_x=randint(x_reinjection_min, x_reinjection_max)
+                new_y=randint(y_reinjection_min, y_reinjection_max)
             
-            #Temp[new_x,new_y]=1+np.random.binomial(1, Ppop, size=None)*3
-            #k+=1
-    
+            Temp[new_x,new_y]=1+np.random.binomial(1, Ppop, size=None)*3
+            k+=1
+            """
     return Temp,k
 
 def resolution(d,taille,Ppop,k1,k2,u):
@@ -208,7 +212,6 @@ def resolv(d,taille,Ppop,k1,k2,u):
 
 def SimulationsPpop(d,taille,u,k1,k2,Npas,Nsim):
     p=np.linspace(0,1,Npas)
-    #Terrains=np.asarray([creerSalle(d,pt,taille[0],taille[1]) for pt in p])
     Ntours=np.asarray([[resolv(d,taille,pt,k1,k2,u) for i in range(Nsim)] for pt in p])
     N=np.zeros(Npas)
     ecart=np.zeros(Npas)
@@ -240,7 +243,6 @@ def resolvSR(d,taille,Ppop,k1,k2,u):
 
 def SimulationsPpopSR(d,taille,u,k1,k2,Npas,Nsim):
     p=np.linspace(0,1,Npas)
-    #Terrains=np.asarray([creerSalle(d,pt,taille[0],taille[1]) for pt in p])
     Ntours=np.asarray([[resolvSR(d,taille,pt,k1,k2,u) for i in range(Nsim)] for pt in p])
     N=np.zeros(Npas)
     ecart=np.zeros(Npas)

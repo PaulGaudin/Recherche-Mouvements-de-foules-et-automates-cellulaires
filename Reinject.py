@@ -6,7 +6,7 @@ import timeit
 from matplotlib import animation, rc
 from random import randint
 
-#Fonction effectuant un déplacement complet de tout les automates en parallèle (méthode de friction): 
+#Fonction effectuant un déplacement complet de tout les automates en parallèle (méthode de friction), en ajoutant la réinjection des automates passant la porte 
 def Deplacement(TM,k,u):
     New,n=friction(TM,k,u)
     Temp=Init(TM.shape[0]-2,TM.shape[1]-2)
