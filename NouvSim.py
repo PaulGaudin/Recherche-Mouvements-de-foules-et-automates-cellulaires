@@ -122,7 +122,7 @@ def ecartType(tableau):
     #Puis on retourn l'écart type qui est la racine carrée de la variance
     return np.sqrt(varTableau)
 
-
+#Affiche une simulation de Npas de k entre kmin et kmax en fonction de mu et d'une pièce de densité et taille donné, Nsim simulations par pas
 @timer
 def SimulationsK(Nb,taille,u,kmin,kmax,Npas,Nsim):
     Terrains=np.asarray([creerSalle(Nb,taille[0],taille[1]) for i in range(Nsim)])
@@ -149,3 +149,26 @@ def SimulationsK(Nb,taille,u,kmin,kmax,Npas,Nsim):
     plt.show()
     plt.figure(figsize=(15,10))
     return compte
+
+#Affiche une simulation de Npas de mu (mu allant de 0 a 1) en fonction de k et d'une pièce de densité et taille donné, Nsim simulations par pas
+@timer    
+def SimulationsU(d,taille,k,Npas,Nsim):
+    Terrains=np.asarray([creerSalle(d,taille[0],taille[1]) for i in range(Nsim)])
+    u=np.linspace(0,1,Npas)
+    Ntours=np.asarray([[resolv(Terrain,k,ut) for Terrain in Terrains] for ut in u])
+    N=np.zeros(Npas)
+    ecart=np.zeros(Npas)
+
+    for i in range(Npas):
+        N[i]=Ntours[i].sum()/Ntours[i].size
+        ecart[i]=ecartType(Ntours[i])
+
+    fig = plt.figure(figsize=(15,10))
+    plt.plot(u,N)
+    plt.xlabel("U")
+    plt.ylabel("Nombre de tours")
+    plt.title(f"Nombre de tour mis pour purger une piece de taille {taille} et densité {d}, en fonction de u (coeff de friction), pour k={k} ({Nsim} simulations par pas, {Npas} pas de u)")
+    plt.errorbar(u, N, yerr=ecart, fmt = 'none', capsize = 10, ecolor = 'red', zorder = 1)
+    plt.show()
+
+
