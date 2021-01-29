@@ -1,4 +1,4 @@
-from fct import *
+from fct import friction,Init,timer,creerSalle
 import matplotlib.colors
 import numpy as np
 import matplotlib.pyplot as plt
