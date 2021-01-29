@@ -126,7 +126,6 @@ def update(TM,TS,k):
 
 #Fonction permettant si il y a conflit de les résoudre en utilisant la méthode de friction :
 def friction(TM,k,u):
-    compte=0
     TS=SFF(TM)
     M,B = update(TM,TS,k)
     M=M.astype(np.int64)
@@ -137,7 +136,6 @@ def friction(TM,k,u):
         for i in I:
             J=np.where(indices==i)[0]
             for j in range(J.size-1):
-                compte+=1
                 if(np.random.binomial(1,u,size=None)==1):
                     M[J[j]]=B[J[j]].copy()
                     M[J[j+1]]=B[J[j+1]].copy()
@@ -145,7 +143,7 @@ def friction(TM,k,u):
                     M[J[j+1]]=B[J[j+1]].copy()
                 else:
                     M[J[j]]=B[J[j]].copy()               
-    return M,compte
+    return M
 
 #Un timer
 def timer(function):
