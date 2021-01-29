@@ -1,4 +1,6 @@
-from Reinject import resolv,creerSalle,timer
+#from Reinject import resolv,creerSalle
+from fct import *
+from base import *
 import matplotlib.colors
 import numpy as np
 import matplotlib.pyplot as plt
@@ -6,7 +8,9 @@ import timeit
 from matplotlib import animation, rc
 from random import randint
 
+    
 
+#Affiche une simulation de Npas de mu (mu allant de 0 a 1) en fonction de k et d'une pièce de densité et taille donné, Nsim simulations par pas
 @timer    
 def SimulationsU(d,taille,k,Npas,Nsim):
     Terrains=np.asarray([creerSalle(d,taille[0],taille[1]) for i in range(Nsim)])
@@ -28,6 +32,7 @@ def SimulationsU(d,taille,k,Npas,Nsim):
     plt.show()
 
 
+#Fonction permettant de calculer l'écart type
 def ecartType(tableau):
     #On défini la moyenne du tableau:
     moy=0
@@ -41,10 +46,11 @@ def ecartType(tableau):
 
     varTableau=varTableau/len(tableau)
 
-    #Puis on retourn l'écart type qui est la racine carrée de la variance
+    #Puis on retourne l'écart type qui est la racine carrée de la variance
     return np.sqrt(varTableau)
 
 
+#Affiche une simulation de Npas de k entre kmin et kmax en fonction de mu et d'une pièce de densité et taille donné, Nsim simulations par pas
 @timer
 def SimulationsK(d,taille,u,kmin,kmax,Npas,Nsim):
     Terrains=np.asarray([creerSalle(d,taille[0],taille[1]) for i in range(Nsim)])
@@ -64,7 +70,10 @@ def SimulationsK(d,taille,u,kmin,kmax,Npas,Nsim):
     plt.title(f"Nombre de tour mis pour purger une piece de taille {taille} et densité {d}, en fonction de k, pour u={u} ({Nsim} simulations par pas, {Npas} pas de k, et k variant de {kmin} a {kmax})")
     plt.errorbar(k, N, yerr=ecart, fmt = 'none', capsize = 10, ecolor = 'red', zorder = 1)
     plt.show()
+    return Ntours
 
+
+#Pareil que SimulationsU mais donne les résultats en mètre et en seconde au lieu de cellule et étapes
 @timer    
 def SimulationsUR(d,taille,k,Npas,Nsim):
     Terrains=np.asarray([creerSalle(d,taille[0],taille[1]) for i in range(Nsim)])
@@ -86,6 +95,7 @@ def SimulationsUR(d,taille,k,Npas,Nsim):
     plt.show()
 
 
+#Pareil que SimulationsK mais donne les résultats en mètre et en seconde au lieu de cellule et étapes
 @timer
 def SimulationsKR(d,taille,u,kmin,kmax,Npas,Nsim):
     Terrains=np.asarray([creerSalle(d,taille[0],taille[1]) for i in range(Nsim)])
