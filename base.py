@@ -22,7 +22,6 @@ def Deplacement(TM,k,u):
 @timer
 def resolv(TM,k,u):
     Nb=0
-    compte=0
     while((TM==Init(TM.shape[0]-2,TM.shape[1]-2)).all()!=1):
         TM=Deplacement(TM,k,u)
         Nb+=1
