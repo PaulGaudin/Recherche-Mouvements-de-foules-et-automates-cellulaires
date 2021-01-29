@@ -24,10 +24,9 @@ def resolv(TM,k,u):
     Nb=0
     compte=0
     while((TM==Init(TM.shape[0]-2,TM.shape[1]-2)).all()!=1):
-        TM,A=Deplacement(TM,k,u)
+        TM=Deplacement(TM,k,u)
         Nb+=1
-        compte+=A
-    return Nb,compte
+    return Nb
 
 
 #Affiche chaque tour jusqu'a ce que tout les automates soient sortis
