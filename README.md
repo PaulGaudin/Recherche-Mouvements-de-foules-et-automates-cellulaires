@@ -8,4 +8,4 @@ Guide d'utilisation :
 - Pour regarder une résolution ou tracer des graphes de deux populations, importez PopM
 
 Referez vous aux commentaires dans les fichiers pour plus de précision.
-Pour une description détaillé de la recherche, voir le fichier Rapport.pdf attaché.
+Pour une description détaillé de la recherche, voir le fichier Présentation.pdf attaché.
