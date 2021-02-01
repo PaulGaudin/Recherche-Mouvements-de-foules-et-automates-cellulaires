@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import timeit
 from matplotlib import animation, rc
 from random import randint
+from mpl_toolkits.mplot3d import Axes3D
 
     
 
@@ -154,4 +155,24 @@ def SimulationsKR(d,taille,u,kmin,kmax,Npas,Nsim):
     plt.ylabel("Temps (en s)")
     plt.title(f"Nombre de tour mis pour purger une piece de taille {taille[0]*0.4,taille[1]*0.4} mètres et densité {d}, en fonction de k, pour u={u} ({Nsim} simulations par pas, {Npas} pas de k, et k variant de {kmin} a {kmax})")
     plt.errorbar(k, N*0.27, yerr=ecart, fmt = 'none', capsize = 10, ecolor = 'red', zorder = 1)
+    plt.show()
+
+
+@timer
+def Simulations3D(d,taille,kmin,kmax,Npask,Npasu,Nsim):
+    Terrains=np.asarray([creerSalle(d,taille[0],taille[1]) for i in range(Nsim)])
+    k=np.linspace(kmin,kmax,Npask)
+    u=np.linspace(0,1,Npasu)
+    x,y=np.meshgrid(u,k)
+    Ntours=np.asarray([[[resolv(Terrain,kt,ut) for Terrain in Terrains] for kt in k] for ut in u])
+    N=[np.zeros(Npask) for i in u]
+    for i in range(Npask):
+        for j in range(Npasu):
+            N[i,j]=Ntours[i,j].sum()/Ntours[i,j].size()
+
+    fig = plt.figure(figsize=(15,10))
+    ax=fig.gca(projection='3d')
+    surf = ax.plot_surface(x,y,N)
+    ax.set_xlabel("k")
+    ax.set_ylabel("Temps (en s)")
     plt.show()
