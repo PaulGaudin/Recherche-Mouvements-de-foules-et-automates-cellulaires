@@ -95,6 +95,30 @@ def SFF(T):
     R = np.vstack((ligneMur, R, ligneMur))
     return R
 
+"""Définition du DFF d'une pièce donnée :
+@params:
+- T la salle dont on veut calculer le SFF
+- D le DFF du tour précédent
+- mu un paramètre du DFF
+- beta un paramètre du DFF
+
+@return:
+- Le DFF de ce tour
+
+
+
+QUESTIONS :
+- Comment implanter le DFF dans l'équation de mouvement ?
+- A quel moment modifier le DFF (avant ou après le mouvement, avant non ?)
+- Des précisions sur les paramètres ? (mu==friction ?)
+"""
+def DFF(T,D,mu,beta):
+    New=Init(D.shape[0]-2,D.shape[1]-2)
+    x,y=np.concatenate(np.where(T==1),np.where(T==0))
+    New[x,y]=(1-0.27*mu)*D[x,y]+beta*T[x,y]+beta*(D[x-1,y]+D[x+1,y]+D[x,y-1]+D[x,y+1]-4*D[x,y])
+    return New
+
+
 
 """Fonction permettant de calculer w le poids associé a un mouvement
 @params:
@@ -133,6 +157,9 @@ def p(Z,W):
 - TS le SFF de la salle considérée
 - u la coordonnée  en x de déplacement de l'agent
 - u la coordonnée  en y de déplacement de l'agent
+
+@return:
+- le poids normalisé associé au déplacement  en [u,v] de l'agent initialement en [x,y]
 """
 def p2(x,y,k,TM,TS,u,v):
     H=[[0,0],[-1,0],[1,0],[0,-1],[0,1],[1,1],[-1,1],[-1,-1],[1,-1]]
@@ -155,6 +182,9 @@ def p2(x,y,k,TM,TS,u,v):
 - k le kappa voulu
 - TM la salle considérée
 - TS le SFF de la salle considérée
+
+@return:
+- Les nouvelles coordonnées de l'agent
 """
 def Mouvement(x,y,k,TM,TS):
     H=[[0,0],[-1,0],[1,0],[0,-1],[0,1],[1,1],[-1,1],[-1,-1],[1,-1]]
@@ -186,6 +216,10 @@ def Mouvement(x,y,k,TM,TS):
 - TS le SFF de la salle considérée
 - u la coordonnée  en x de déplacement de l'agent
 - u la coordonnée  en y de déplacement de l'agent
+
+@return:
+- Mouv le tableau contenant toute les nouvelles coordonnées des agents
+- Base le tableau contenant toute les coordonnées des agents initialement a ce tour
 """
 def update(TM,TS,k):
     x,y = np.where(TM==1)
@@ -200,7 +234,7 @@ def update(TM,TS,k):
 - u le mu voulu
 
 @return:
-- Nb le nombre de tour mis pour purger la salle
+- M le tableau contenant toute les nouvelles positions finales des agents
 """
 def friction(TM,k,u):
     TS=SFF(TM)
